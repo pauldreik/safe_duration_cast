@@ -12,6 +12,7 @@ set(FUZZ_LDFLAGS "" CACHE STRING "LDFLAGS for the fuzz targets")
 #find all fuzzers.
 set(SOURCES
 chrono.cpp
+floating.cpp
 )
 
 if(FUZZ_LINKMAIN)
