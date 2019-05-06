@@ -29,7 +29,8 @@ safe_duration_cast(From from, int& ec)
     const auto to = detail::duration_cast_float2float<To>(from, ec);
     return to;
   }
-  // fallback to std
+
+  // fallback to std for cross conversions
   return std::chrono::duration_cast<To>(from);
 }
 

@@ -86,3 +86,25 @@ TEST_CASE("expected to underflow, long")
   using Milli = std::chrono::duration<long, std::milli>;
   verify_expected_error(Milli{ std::numeric_limits<long>::min() }, Micro{});
 }
+
+TEST_CASE("floating point sunshine upscale")
+{
+  using Micro = std::chrono::duration<float, std::micro>;
+  using Milli = std::chrono::duration<float, std::milli>;
+  int err;
+  const auto to =
+    safe_duration_cast::safe_duration_cast<Micro>(Milli{ 1 }, err);
+  REQUIRE(err == 0);
+  REQUIRE(to.count() == 1000);
+}
+
+TEST_CASE("floating point sunshine downscale")
+{
+  using Micro = std::chrono::duration<float, std::micro>;
+  using Milli = std::chrono::duration<float, std::milli>;
+  int err;
+  const auto to =
+    safe_duration_cast::safe_duration_cast<Milli>(Micro{ 1000 }, err);
+  REQUIRE(err == 0);
+  REQUIRE(to.count() == 1);
+}

@@ -22,7 +22,6 @@ main(int argc, char* argv[])
   using From = std::chrono::duration<int, std::milli>;
   using To = std::chrono::duration<int, std::deci>;
 
-
   const auto to = safe_duration_cast::safe_duration_cast<To>(From{ 1 });
 
   doit<std::chrono::milliseconds>(std::chrono::seconds{ 23 });
