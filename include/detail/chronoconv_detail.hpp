@@ -98,6 +98,23 @@ duration_cast_int2int(From from, int& ec)
 }
 
 template<typename To, typename From>
+To
+convert_and_check_cfenv(From from)
+{
+  assert(std::fetestexcept(FE_INVALID) == 0);
+  static_assert(std::is_floating_point<From>::value);
+  To count = from;
+  if constexpr (std::is_floating_point<To>::value) {
+    // conversion float -> float
+    assert(std::fetestexcept(FE_INVALID) == 0);
+  } else {
+    // conversion float->integer
+    assert(std::fetestexcept(FE_INVALID) == 0);
+  }
+  return count;
+}
+
+template<typename To, typename From>
 constexpr To
 duration_cast_float2float(From from, int& ec)
 {
@@ -120,15 +137,9 @@ duration_cast_float2float(From from, int& ec)
                               typename To::rep,
                               decltype(Factor::num)>::type;
 
-  IntermediateRep count = from.count();
-
-  if constexpr (std::is_floating_point<IntermediateRep>::value) {
-    // conversion float -> integer
-    assert(std::fetestexcept(FE_INVALID) == 0);
-  } else {
-    // conversion float->float
-    assert(std::fetestexcept(FE_INVALID) == 0);
-  }
+  // check this in a template, to get type info in the error message
+  IntermediateRep count =
+    convert_and_check_cfenv<IntermediateRep>(from.count());
 
   // multiply with Factor::num without overflow or underflow
   constexpr auto max1 =
