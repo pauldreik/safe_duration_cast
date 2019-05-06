@@ -44,6 +44,7 @@ use_different_rep(const Item item)
 
   int ec;
   const auto to = safe_duration_cast::safe_duration_cast<To>(from, ec);
+  assert(std::fetestexcept(FE_INVALID) != 0);
 }
 
 // Item is the underlying type for duration (int, long etc)

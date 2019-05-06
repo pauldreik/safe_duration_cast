@@ -4,6 +4,7 @@
 #include <limits>
 #include <stdexcept>
 #include <type_traits>
+#include <cfenv>
 
 #include <detail/lossless_conversion.hpp>
 
@@ -120,6 +121,8 @@ duration_cast_float2float(From from, int& ec)
                               decltype(Factor::num)>::type;
 
   IntermediateRep count = from.count();
+  assert(std::fetestexcept(FE_INVALID) != 0);
+
   /*
   if constexpr (std::is_floating_point<IntermediateRep>::value) {
           //conversion float -> integer
@@ -141,12 +144,14 @@ duration_cast_float2float(From from, int& ec)
     return {};
   }
   count *= Factor::num;
+  assert(std::fetestexcept(FE_INVALID) != 0);
 
   // this can't go wrong, right? den>0 is checked earlier.
   count /= Factor::den;
   // convert to the to type, safely
   using ToRep = typename To::rep;
   const ToRep tocount = static_cast<ToRep>(count);
+  assert(std::fetestexcept(FE_INVALID) != 0);
   if (ec) {
     return {};
   }
