@@ -20,11 +20,33 @@ is_duration(...)
 {
   return false;
 }
+template<typename Rep, typename Period>
+constexpr bool is_integral_duration(std::chrono::duration<Rep, Period>)
+{
+  return std::is_integral<Rep>::value;
+}
+constexpr bool
+is_integral_duration(...)
+{
+  return false;
+}
+template<typename Rep, typename Period>
+constexpr bool is_floating_duration(std::chrono::duration<Rep, Period>)
+{
+  return std::is_floating_point<Rep>::value;
+}
+constexpr bool
+is_floating_duration(...)
+{
+  return false;
+}
 
 template<typename To, typename From>
 constexpr To
-duration_cast_impl(From from, int& ec)
+duration_cast_int2int(From from, int& ec)
 {
+  static_assert(is_integral_duration(From{}), "from must be integral");
+  static_assert(is_integral_duration(To{}), "to must be integral");
   ec = 0;
   // the basic idea is that we need to convert from count() in the from type
   // to count() in the To type, by multiplying it with this:
@@ -74,5 +96,12 @@ duration_cast_impl(From from, int& ec)
   return To{ tocount };
 }
 
+template<typename To, typename From>
+constexpr To
+duration_cast_float2float(From from, int& ec)
+{
+  // for now - use std chrono
+  return std::chrono::duration_cast<To>(from);
+}
 } // detail
 } // namespace safe_duration_cast

@@ -16,8 +16,21 @@ safe_duration_cast(From from, int& ec)
   static_assert(detail::is_duration(To{}), "To is not a duration");
 
   // const auto to = std::chrono::duration_cast<To>(from);
-  const auto to = detail::duration_cast_impl<To>(from, ec);
-  return to;
+  constexpr bool From_is_integral = detail::is_integral_duration(From{});
+  constexpr bool To_is_integral = detail::is_integral_duration(To{});
+  constexpr bool From_is_floating = detail::is_floating_duration(From{});
+  constexpr bool To_is_floating = detail::is_floating_duration(To{});
+  if constexpr (From_is_integral && To_is_integral) {
+    const auto to = detail::duration_cast_int2int<To>(from, ec);
+    return to;
+  }
+
+  if constexpr (From_is_floating && To_is_floating) {
+    const auto to = detail::duration_cast_float2float<To>(from, ec);
+    return to;
+  }
+  // fallback to std
+  return std::chrono::duration_cast<To>(from);
 }
 
 // throwing version
