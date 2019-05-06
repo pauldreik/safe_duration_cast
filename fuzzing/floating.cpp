@@ -44,7 +44,7 @@ use_different_rep(const Item item)
 
   int ec;
   const auto to = safe_duration_cast::safe_duration_cast<To>(from, ec);
-  assert(std::fetestexcept(FE_INVALID) != 0);
+  assert(std::fetestexcept(FE_INVALID) == 0);
 }
 
 // Item is the underlying type for duration (int, long etc)
@@ -92,14 +92,17 @@ LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
     if (i == firsttype) {
       static_foreach(fundamental_ints{}, [=](auto j, auto b) {
         if (j == secondtype) {
+          assert(std::fetestexcept(FE_INVALID) == 0);
+
           using A = std::decay_t<decltype(a)>;
           using B = std::decay_t<decltype(b)>;
           doit<A, B>(Data, Size);
+          assert(std::fetestexcept(FE_INVALID) == 0);
         }
       });
     }
   });
-  assert(std::fetestexcept(FE_INVALID) != 0);
+  assert(std::fetestexcept(FE_INVALID) == 0);
   return 0;
 }
 

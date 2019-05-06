@@ -1,10 +1,10 @@
 #include <cassert>
+#include <cfenv>
 #include <chrono>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
 #include <type_traits>
-#include <cfenv>
 
 #include <detail/lossless_conversion.hpp>
 
@@ -121,15 +121,15 @@ duration_cast_float2float(From from, int& ec)
                               decltype(Factor::num)>::type;
 
   IntermediateRep count = from.count();
-  assert(std::fetestexcept(FE_INVALID) != 0);
 
-  /*
   if constexpr (std::is_floating_point<IntermediateRep>::value) {
-          //conversion float -> integer
+    // conversion float -> integer
+    assert(std::fetestexcept(FE_INVALID) == 0);
   } else {
-          //conversion float->float
+    // conversion float->float
+    assert(std::fetestexcept(FE_INVALID) == 0);
   }
-  */
+
   // multiply with Factor::num without overflow or underflow
   constexpr auto max1 =
     std::numeric_limits<IntermediateRep>::max() / Factor::num;
@@ -144,14 +144,14 @@ duration_cast_float2float(From from, int& ec)
     return {};
   }
   count *= Factor::num;
-  assert(std::fetestexcept(FE_INVALID) != 0);
+  assert(std::fetestexcept(FE_INVALID) == 0);
 
   // this can't go wrong, right? den>0 is checked earlier.
   count /= Factor::den;
   // convert to the to type, safely
   using ToRep = typename To::rep;
   const ToRep tocount = static_cast<ToRep>(count);
-  assert(std::fetestexcept(FE_INVALID) != 0);
+  assert(std::fetestexcept(FE_INVALID) == 0);
   if (ec) {
     return {};
   }
