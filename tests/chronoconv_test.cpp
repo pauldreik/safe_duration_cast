@@ -108,3 +108,11 @@ TEST_CASE("floating point sunshine downscale")
   REQUIRE(err == 0);
   REQUIRE(to.count() == 1);
 }
+
+// FIXME - nan
+
+// FIXME - inf
+
+// FIXME - known to overflow
+
+// FIXME - known to underflow

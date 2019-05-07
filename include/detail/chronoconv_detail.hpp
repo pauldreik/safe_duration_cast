@@ -1,6 +1,7 @@
 #include <cassert>
 #include <cfenv>
 #include <chrono>
+#include <cmath>
 #include <iostream>
 #include <limits>
 #include <stdexcept>
@@ -106,6 +107,9 @@ convert_and_check_cfenv(From from)
   To count = from;
   if constexpr (std::is_floating_point<To>::value) {
     // conversion float -> float
+    if (std::fetestexcept(FE_INVALID) != 0) {
+      std::cout << "From=" << from << '\n';
+    }
     assert(std::fetestexcept(FE_INVALID) == 0);
   } else {
     // conversion float->integer
@@ -120,6 +124,19 @@ duration_cast_float2float(From from, int& ec)
 {
   static_assert(is_floating_duration(From{}), "from must be floating point");
   static_assert(is_floating_duration(To{}), "to must be floating point");
+  assert(std::fetestexcept(FE_INVALID) == 0);
+  if (std::isnan(from.count())) {
+    // seems like the use of isnan raises an exception in itself!
+    std::feclearexcept(FE_ALL_EXCEPT);
+    assert(std::fetestexcept(FE_INVALID) == 0);
+    // nan in, gives nan out. easy.
+    return To{ std::numeric_limits<typename To::rep>::quiet_NaN() };
+  }
+  // maybe we should also check if from is denormal, and decide what to do about
+  // it.
+
+  assert(std::fetestexcept(FE_INVALID) == 0);
+
   ec = 0;
   // the basic idea is that we need to convert from count() in the from type
   // to count() in the To type, by multiplying it with this:
@@ -149,7 +166,7 @@ duration_cast_float2float(From from, int& ec)
     return {};
   }
   constexpr auto min1 =
-    std::numeric_limits<IntermediateRep>::min() / Factor::num;
+    std::numeric_limits<IntermediateRep>::lowest() / Factor::num;
   if (count < min1) {
     ec = 1;
     return {};

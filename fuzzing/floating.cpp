@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <vector>
 
+#include <boost/multiprecision/cpp_bin_float.hpp>
 #include <cfenv>
 #include <tuple>
 #include <utility>
@@ -33,17 +34,75 @@ static_foreach(const std::tuple<T...>& t, Func&& f)
   foreach_detail::static_foreach_impl(
     t, std::forward<Func>(f), std::make_index_sequence<tuple_size>{});
 }
-
-template<typename Item, typename Ratio, typename ToRep>
-void
-use_different_rep(const Item item)
+auto
+makeBoostLargeFloat()
 {
-  using From = std::chrono::duration<Item, Ratio>;
-  const From from{ item };
-  using To = std::chrono::duration<ToRep, Ratio>;
+  using namespace boost::multiprecision;
+  return number<backends::cpp_bin_float<237,
+                                        backends::digit_base_2,
+                                        void,
+                                        boost::int32_t,
+                                        -262142,
+                                        262143>,
+                et_off>{};
+}
+template<typename FromRep, typename Ratio, typename ToRep, typename RatioTo>
+void
+use_different_rep(const FromRep item)
+{
+  assert(std::fetestexcept(FE_INVALID) == 0);
 
+  using From = std::chrono::duration<FromRep, Ratio>;
+  const From from{ item };
+  using To = std::chrono::duration<ToRep, RatioTo>;
+
+  assert(std::fetestexcept(FE_INVALID) == 0);
   int ec;
   const auto to = safe_duration_cast::safe_duration_cast<To>(from, ec);
+  assert(std::fetestexcept(FE_INVALID) == 0);
+
+  if (ec) {
+    // could not convert, fine
+    return;
+  }
+  assert(std::fetestexcept(FE_INVALID) == 0);
+
+  // could convert. let's check the result is as expected
+  using LargeFloat = decltype(
+    makeBoostLargeFloat()); // boost::multiprecision::cpp_bin_float_double_extended;
+  using K = typename std::ratio_divide<Ratio, RatioTo>::type;
+  const LargeFloat b = [=]() {
+    assert(std::fetestexcept(FE_INVALID) == 0);
+    LargeFloat tmp{ item };
+    //seems like this sets exceptions. clear them.
+    std::feclearexcept(FE_ALL_EXCEPT);
+    assert(std::fetestexcept(FE_INVALID) == 0);
+    tmp *= LargeFloat{ K::num };
+    assert(std::fetestexcept(FE_INVALID) == 0);
+    tmp /= LargeFloat{ K::den };
+    assert(std::fetestexcept(FE_INVALID) == 0);
+    return tmp;
+  }();
+  const LargeFloat absdiff = b - LargeFloat{ to.count() };
+  assert(std::fetestexcept(FE_INVALID) == 0);
+  const LargeFloat absb = b < 0 ? -b : b; // std::abs(b);
+  assert(std::fetestexcept(FE_INVALID) == 0);
+  // if we are finite and above the subnormal range, do a relative check of
+  // the result
+  if (/*std::isfinite(absb) &&*/ absb > std::numeric_limits<FromRep>::min() &&
+      absb > std::numeric_limits<ToRep>::min()) {
+    const LargeFloat reldiff = absdiff / absb;
+    assert(std::fetestexcept(FE_INVALID) == 0);
+    auto tol = std::numeric_limits<FromRep>::epsilon() * 2;
+    assert(std::fetestexcept(FE_INVALID) == 0);
+    if (!(reldiff < tol)) {
+      assert(std::fetestexcept(FE_INVALID) == 0);
+      std::cout << "from=" << from.count() << " to=" << to.count() << " b=" << b
+                << " absdiff=" << absdiff << " reldiff=" << reldiff
+                << " tol=" << tol << '\n';
+    }
+    assert(reldiff < tol);
+  }
   assert(std::fetestexcept(FE_INVALID) == 0);
 }
 
@@ -62,8 +121,11 @@ doit(const uint8_t* Data, std::size_t Size)
   Size -= N1;
   using ratios = std::tuple<std::milli, std::kilo>;
   static_foreach(ratios{}, [=](auto /*i*/, auto a) {
-    using R = decltype(a);
-    use_different_rep<Item1, R, Item2>(item1);
+    using RatioFrom = decltype(a);
+    static_foreach(ratios{}, [=](auto /*i*/, auto b) {
+      using RatioTo = decltype(b);
+      use_different_rep<Item1, RatioFrom, Item2, RatioTo>(item1);
+    });
   });
 }
 

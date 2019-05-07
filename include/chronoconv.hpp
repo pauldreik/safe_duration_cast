@@ -26,7 +26,9 @@ safe_duration_cast(From from, int& ec)
   }
 
   if constexpr (From_is_floating && To_is_floating) {
+    assert(std::fetestexcept(FE_INVALID) == 0);
     const auto to = detail::duration_cast_float2float<To>(from, ec);
+    assert(std::fetestexcept(FE_INVALID) == 0);
     return to;
   }
 
