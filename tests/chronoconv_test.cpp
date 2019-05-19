@@ -31,6 +31,7 @@ verify_expected_success(From from, To expected)
   REQUIRE(err == 0);
   REQUIRE(expected.count() == to.count());
 }
+
 template<typename From, typename To>
 void
 verify_expected_error(From from, To /*expected*/)
@@ -41,6 +42,7 @@ verify_expected_error(From from, To /*expected*/)
                 "programming error");
   REQUIRE(err != 0);
 }
+
 TEST_CASE("same representation different ratio")
 {
   using Micro = std::chrono::duration<int, std::micro>;
@@ -51,12 +53,13 @@ TEST_CASE("same representation different ratio")
   verify_expected_success(Milli{ -1000 }, Deci{ -10 });
   verify_expected_success(Milli{ -1000 }, Micro{ -1000000 });
 }
+
 TEST_CASE("same ratio different representation")
 {
   using Small = std::chrono::duration<short, std::milli>;
   using Large = std::chrono::duration<int, std::milli>;
   for (auto value : { -2000, -1000, -1, 0, 1, 1000, 2000 }) {
-    verify_expected_success(Small{ 1000 }, Large{ 1000 });
+    verify_expected_success(Small{ value }, Large{ value });
   }
 }
 
