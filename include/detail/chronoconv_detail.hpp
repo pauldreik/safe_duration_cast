@@ -68,7 +68,7 @@ duration_cast_int2int(From from, int& ec)
 
   // safe conversion to IntermediateRep
   IntermediateRep count =
-    lossless_conversion<IntermediateRep>(from.count(), ec);
+		  lossless_integral_conversion<IntermediateRep>(from.count(), ec);
   if (ec) {
     return {};
   }
@@ -91,7 +91,7 @@ duration_cast_int2int(From from, int& ec)
   count /= Factor::den;
   // convert to the to type, safely
   using ToRep = typename To::rep;
-  const ToRep tocount = lossless_conversion<ToRep>(count, ec);
+  const ToRep tocount = lossless_integral_conversion<ToRep>(count, ec);
   if (ec) {
     return {};
   }

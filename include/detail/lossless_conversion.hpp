@@ -18,7 +18,7 @@ namespace safe_duration_cast {
  */
 template<typename To, typename From>
 constexpr To
-lossless_conversion(From from, int& ec)
+lossless_integral_conversion(From from, int& ec)
 {
   ec = 0;
   using F = std::numeric_limits<From>;

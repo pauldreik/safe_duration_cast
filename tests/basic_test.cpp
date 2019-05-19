@@ -31,7 +31,7 @@ TEST_CASE("negative value to unsigned")
   const int negative = -1;
   int err;
   const auto to =
-    safe_duration_cast::lossless_conversion<unsigned>(negative, err);
+    safe_duration_cast::lossless_integral_conversion<unsigned>(negative, err);
 
   REQUIRE(err != 0);
 }
@@ -41,7 +41,7 @@ TEST_CASE("positive value to unsigned")
   const int positive = 123;
   int err;
   const auto to =
-    safe_duration_cast::lossless_conversion<unsigned>(positive, err);
+    safe_duration_cast::lossless_integral_conversion<unsigned>(positive, err);
 
   REQUIRE(err == 0);
   REQUIRE(positive == to);
@@ -55,7 +55,7 @@ void
 verifyLossless(const From from)
 {
   int err = 0;
-  const auto to = safe_duration_cast::lossless_conversion<To>(from, err);
+  const auto to = safe_duration_cast::lossless_integral_conversion<To>(from, err);
   REQUIRE(err == 0);
 
   // use a very large type to make sure the result is as expected
@@ -69,7 +69,7 @@ void
 verifyError(const From from)
 {
   int err = 0;
-  const auto to = safe_duration_cast::lossless_conversion<To>(from, err);
+  const auto to = safe_duration_cast::lossless_integral_conversion<To>(from, err);
   REQUIRE(err != 0);
 }
 
@@ -81,7 +81,7 @@ void
 verifyErrorOrCorrect(const From from)
 {
   int err = 0;
-  const auto to = safe_duration_cast::lossless_conversion<To>(from, err);
+  const auto to = safe_duration_cast::lossless_integral_conversion<To>(from, err);
   if (err) {
     REQUIRE(err != 0);
   } else {
