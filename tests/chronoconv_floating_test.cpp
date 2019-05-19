@@ -8,6 +8,7 @@
 #include <catch.hpp>
 
 #include "testsupport.hpp"
+#include <chrono>
 #include <chronoconv.hpp>
 #include <type_traits>
 
@@ -63,6 +64,38 @@ TEST_CASE("double nan should give nan or error out")
 TEST_CASE("long double nan should give nan or error out")
 {
   verifyNaN(std::numeric_limits<long double>::quiet_NaN());
+}
+
+/*
+ * verify that +inf should give +inf as outut
+ */
+template<typename Rep>
+void
+verifyInf(Rep inf)
+{
+  using Micro = std::chrono::duration<Rep, std::micro>;
+  using Milli = std::chrono::duration<Rep, std::milli>;
+  int err;
+  const auto to =
+    safe_duration_cast::safe_duration_cast<Milli>(Micro{ inf }, err);
+  REQUIRE(err == 0);
+  static_assert(std::numeric_limits<Rep>::has_infinity);
+  REQUIRE(std::isinf(to.count()));
+}
+TEST_CASE("float inf should give inf")
+{
+  verifyInf(+std::numeric_limits<float>::infinity());
+  verifyInf(-std::numeric_limits<float>::infinity());
+}
+TEST_CASE("double inf should give inf")
+{
+  verifyInf(+std::numeric_limits<double>::infinity());
+  verifyInf(-std::numeric_limits<double>::infinity());
+}
+TEST_CASE("long double inf should give inf")
+{
+  verifyInf(+std::numeric_limits<long double>::infinity());
+  verifyInf(-std::numeric_limits<long double>::infinity());
 }
 // FIXME - inf
 
