@@ -56,7 +56,14 @@ TEST_CASE("float nan should give nan or error out")
 {
   verifyNaN(std::numeric_limits<float>::quiet_NaN());
 }
-
+TEST_CASE("double nan should give nan or error out")
+{
+  verifyNaN(std::numeric_limits<double>::quiet_NaN());
+}
+TEST_CASE("long double nan should give nan or error out")
+{
+  verifyNaN(std::numeric_limits<long double>::quiet_NaN());
+}
 // FIXME - inf
 
 // FIXME - known to overflow (towards +inf)

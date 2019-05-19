@@ -5,7 +5,21 @@
 namespace safe_duration_cast {
 /**
  * converts From to To (potentially lossy, just like std::chrono::duration_cast,
- * but avoids overflow
+ * but avoids internal overflow.
+ *
+ * if the conversion is from an integral type to another - all types of error
+ * are caught, that is, either the correct result is obtained, or the error flag
+ * is set. undefined behaviour from
+ *
+ * for conversions between floating point values, the situation is more tricky.
+ *
+ * value       |   result
+ * ---------------------------
+ * NaN         |   NaN
+ * +Inf        |   +Inf
+ * "normal"    |   the correct result, or ec is set.
+ * subnormal   |   best effort
+ * -Inf        |   -Inf
  */
 template<typename To, typename From>
 constexpr To
