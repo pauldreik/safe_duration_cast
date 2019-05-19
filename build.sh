@@ -5,16 +5,21 @@
 
 set -e
 
-root=$(dirname "$0")
+root=$(readlink -f $(dirname "$0"))
 
-if [ -e "$root/build" ] ;  then
-   rm -rf "$root/build"
-fi
-
-mkdir -p "$root/build"
-
+if [ ! -e "$root/build" ] ;  then
 cd "$root/build"
 cmake .. -GNinja
 
+ninja
+fi
+
+
+#make a fuzzer build
+mkdir "$root/build-libfuzzer"
+cd "$root/build-libfuzzer"
+CXX=clang++ CXXFLAGS="-fsanitize=fuzzer-no-link,undefined,address" \
+cmake $root -DBUILD_EXAMPLES=Off -DBUILD_FUZZERS=On -DBUILD_UNITTESTS=Off \
+-DCMAKE_BUILD_TYPE=Debug -DFUZZ_LINKMAIN=Off -GNinja -DFUZZ_LDFLAGS=-fsanitize=fuzzer
 ninja
 

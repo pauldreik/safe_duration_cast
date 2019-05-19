@@ -15,6 +15,7 @@
 #include <type_traits>
 
 #include <detail/lossless_conversion.hpp>
+#include <detail/safe_float_conversion.hpp>
 
 namespace safe_duration_cast {
 
@@ -190,11 +191,12 @@ duration_cast_float2float(From from, int& ec)
   count /= Factor::den;
   // convert to the to type, safely
   using ToRep = typename To::rep;
-  const ToRep tocount = static_cast<ToRep>(count);
-  assert(std::fetestexcept(FE_INVALID) == 0);
+
+  const ToRep tocount = safe_float_conversion<ToRep>(count, ec);
   if (ec) {
     return {};
   }
+  assert(std::fetestexcept(FE_INVALID) == 0);
   return To{ tocount };
 }
 } // detail

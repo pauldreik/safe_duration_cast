@@ -72,6 +72,13 @@ use_different_rep(const FromRep item)
   }
   assert(std::fetestexcept(FE_INVALID) == 0);
 
+  if(std::isinf(from.count())) {
+	  assert(std::isinf(to.count()));
+	  return;
+  }
+  std::feclearexcept(FE_ALL_EXCEPT);
+  assert(std::fetestexcept(FE_INVALID) == 0);
+
   // could convert. let's check the result is as expected
   using LargeFloat = decltype(
     makeBoostLargeFloat()); // boost::multiprecision::cpp_bin_float_double_extended;
@@ -88,6 +95,7 @@ use_different_rep(const FromRep item)
     assert(std::fetestexcept(FE_INVALID) == 0);
     return tmp;
   }();
+
   const LargeFloat absdiff = b - LargeFloat{ to.count() };
   assert(std::fetestexcept(FE_INVALID) == 0);
   const LargeFloat absb = b < 0 ? -b : b; // std::abs(b);
@@ -98,7 +106,10 @@ use_different_rep(const FromRep item)
       absb > std::numeric_limits<ToRep>::min()) {
     const LargeFloat reldiff = absdiff / absb;
     assert(std::fetestexcept(FE_INVALID) == 0);
-    auto tol = std::numeric_limits<FromRep>::epsilon() * 2;
+    const auto tol1 = std::numeric_limits<FromRep>::epsilon() * 2;
+    const auto tol2 = std::numeric_limits<ToRep>::epsilon() * 2;
+    using TolType=long double;//std::common_type<typename FromRep,typename ToRep>;//::type;
+    const auto tol=std::max(TolType{tol1},TolType{tol2});
     assert(std::fetestexcept(FE_INVALID) == 0);
     if (!(reldiff < tol)) {
       assert(std::fetestexcept(FE_INVALID) == 0);
