@@ -10,7 +10,8 @@ option(VERBOSE_UNITTESTS "enables more verbose printouts during unit tests" Off)
 
 set(source_files
    integer_conversions_test.cpp
-   chronoconv_test.cpp
+   chronoconv_integers_test.cpp
+   chronoconv_floating_test.cpp
    unittest_main.cpp
    )
       
