@@ -135,6 +135,11 @@ duration_cast_float2float(From from, int& ec)
   // maybe we should also check if from is denormal, and decide what to do about
   // it.
 
+  // +-inf should be preserved.
+  if (std::isinf(from.count())) {
+    return To{ from.count() };
+  }
+
   assert(std::fetestexcept(FE_INVALID) == 0);
 
   ec = 0;
