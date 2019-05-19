@@ -9,7 +9,7 @@ option(VERBOSE_UNITTESTS "enables more verbose printouts during unit tests" Off)
 
 
 set(source_files
-   basic_test.cpp
+   integer_conversions_test.cpp
    chronoconv_test.cpp
    unittest_main.cpp
    )
