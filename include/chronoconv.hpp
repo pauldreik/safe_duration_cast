@@ -20,6 +20,13 @@ namespace safe_duration_cast {
  * "normal"    |   the correct result, or ec is set.
  * subnormal   |   best effort
  * -Inf        |   -Inf
+ *
+ *
+ * conversions between integral and floating point is not yet supported and wont
+ * compile.
+ *
+ * types not recognized as either integral or floatinpoint, will be directed to
+ * std::chrono::duration_cast
  */
 template<typename To, typename From>
 constexpr To
@@ -29,7 +36,6 @@ safe_duration_cast(From from, int& ec)
   static_assert(detail::is_duration(From{}), "From is not a duration");
   static_assert(detail::is_duration(To{}), "To is not a duration");
 
-  // const auto to = std::chrono::duration_cast<To>(from);
   constexpr bool From_is_integral = detail::is_integral_duration(From{});
   constexpr bool To_is_integral = detail::is_integral_duration(To{});
   constexpr bool From_is_floating = detail::is_floating_duration(From{});
@@ -46,7 +52,12 @@ safe_duration_cast(From from, int& ec)
     return to;
   }
 
-  // fallback to std for cross conversions
+  static_assert(!(From_is_integral && To_is_floating),
+                "integral->float not supported yet");
+  static_assert(!(From_is_floating && To_is_integral),
+                "float->integral not supported yet");
+
+  // fallback to std for cases not caught above
   return std::chrono::duration_cast<To>(from);
 }
 

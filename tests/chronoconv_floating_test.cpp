@@ -97,8 +97,33 @@ TEST_CASE("long double inf should give inf")
   verifyInf(+std::numeric_limits<long double>::infinity());
   verifyInf(-std::numeric_limits<long double>::infinity());
 }
-// FIXME - inf
 
-// FIXME - known to overflow (towards +inf)
-
-// FIXME - known to underflow (towards -inf)
+/*
+ *  trigger internal overflow, both in positive and negative direction
+ */
+template<typename Rep>
+void
+verifyInternalOverflow(Rep large)
+{
+  using Micro = std::chrono::duration<Rep, std::micro>;
+  using Milli = std::chrono::duration<Rep, std::milli>;
+  int err;
+  const auto to =
+    safe_duration_cast::safe_duration_cast<Micro>(Milli{ large }, err);
+  REQUIRE(err != 0);
+}
+TEST_CASE("float overflow/underflow should be noticed")
+{
+  verifyInternalOverflow(std::numeric_limits<float>::max() / 2);
+  verifyInternalOverflow(std::numeric_limits<float>::lowest() / 2);
+}
+TEST_CASE("double overflow/underflow should be noticed")
+{
+  verifyInternalOverflow(std::numeric_limits<double>::max() / 2);
+  verifyInternalOverflow(std::numeric_limits<double>::lowest() / 2);
+}
+TEST_CASE("long double overflow/underflow should be noticed")
+{
+  verifyInternalOverflow(std::numeric_limits<long double>::max() / 2);
+  verifyInternalOverflow(std::numeric_limits<long double>::lowest() / 2);
+}
