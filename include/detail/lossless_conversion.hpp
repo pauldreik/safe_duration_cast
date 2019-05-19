@@ -1,10 +1,10 @@
 /*
- * lossless_conversion.hpp
+ * By Paul Dreik 2019
  *
- *  Created on: 4 maj 2019
- *      Author: paul
+ * License:
+ * dual license, pick your choice. Either Boost license 1.0, or GPL(v2 or later,
+ * at your option).
  */
-
 #ifndef INCLUDE_DETAIL_LOSSLESS_CONVERSION_HPP_
 #define INCLUDE_DETAIL_LOSSLESS_CONVERSION_HPP_
 

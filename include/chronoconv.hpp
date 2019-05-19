@@ -1,19 +1,32 @@
-#include <stdexcept>
+/*
+ * By Paul Dreik 2019
+ *
+ * License:
+ * dual license, pick your choice. Either Boost license 1.0, or GPL(v2 or later,
+ * at your option).
+ */
 
 #include <detail/chronoconv_detail.hpp>
 
+// support compiling with exceptions disabled
+// this works in gcc>=5 and clang>=3.6 (have not tested visual studio)
+#if __cpp_exceptions >= 199711
+#define SAFE_CHRONO_CONV_HAVE_EXCEPTIONS 1
+#include <stdexcept>
+#endif
+
 namespace safe_duration_cast {
 /**
- * converts From to To (potentially lossy, just like std::chrono::duration_cast,
- * but avoids internal overflow.
+ * A safe version of std::chrono_duration_cast, reporting an error instead
+ * of invoking undefined behaviour through internal overflows and casts.
  *
  * if the conversion is from an integral type to another - all types of error
  * are caught, that is, either the correct result is obtained, or the error flag
- * is set. undefined behaviour from
+ * is set. undefined behaviour from signed integral overflow is avoided.
  *
- * for conversions between floating point values, the situation is more tricky.
+ * for conversions between floating point values, the conversion is as follows:
  *
- * value       |   result
+ * input       |   result
  * ---------------------------
  * NaN         |   NaN
  * +Inf        |   +Inf
@@ -25,8 +38,8 @@ namespace safe_duration_cast {
  * conversions between integral and floating point is not yet supported and wont
  * compile.
  *
- * types not recognized as either integral or floatinpoint, will be directed to
- * std::chrono::duration_cast
+ * types not recognized as either integral or floating point (asking
+ * std::numeric_limits), will be directed to std::chrono::duration_cast
  */
 template<typename To, typename From>
 constexpr To
@@ -61,6 +74,7 @@ safe_duration_cast(From from, int& ec)
   return std::chrono::duration_cast<To>(from);
 }
 
+#if SAFE_CHRONO_CONV_HAVE_EXCEPTIONS
 // throwing version
 template<typename To, typename From>
 To
@@ -73,4 +87,5 @@ safe_duration_cast(From from)
   }
   return ret;
 } // func
+#endif
 } // namespace safe_duration_cast

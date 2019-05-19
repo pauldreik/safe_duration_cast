@@ -1,5 +1,10 @@
-// Copyright (c) 2019, Paul Dreik
-
+/*
+ * By Paul Dreik 2019
+ *
+ * License:
+ * dual license, pick your choice. Either Boost license 1.0, or GPL(v2 or later,
+ * at your option).
+ */
 #include <chronoconv.hpp>
 #include <cstdint>
 #include <cstring>
