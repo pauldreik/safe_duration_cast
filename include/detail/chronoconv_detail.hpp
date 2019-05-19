@@ -68,7 +68,7 @@ duration_cast_int2int(From from, int& ec)
 
   // safe conversion to IntermediateRep
   IntermediateRep count =
-		  lossless_integral_conversion<IntermediateRep>(from.count(), ec);
+    lossless_integral_conversion<IntermediateRep>(from.count(), ec);
   if (ec) {
     return {};
   }

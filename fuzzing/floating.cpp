@@ -74,7 +74,7 @@ use_different_rep(const FromRep item)
   const LargeFloat b = [=]() {
     assert(std::fetestexcept(FE_INVALID) == 0);
     LargeFloat tmp{ item };
-    //seems like this sets exceptions. clear them.
+    // seems like this sets exceptions. clear them.
     std::feclearexcept(FE_ALL_EXCEPT);
     assert(std::fetestexcept(FE_INVALID) == 0);
     tmp *= LargeFloat{ K::num };

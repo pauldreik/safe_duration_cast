@@ -55,7 +55,8 @@ void
 verifyLossless(const From from)
 {
   int err = 0;
-  const auto to = safe_duration_cast::lossless_integral_conversion<To>(from, err);
+  const auto to =
+    safe_duration_cast::lossless_integral_conversion<To>(from, err);
   REQUIRE(err == 0);
 
   // use a very large type to make sure the result is as expected
@@ -69,7 +70,8 @@ void
 verifyError(const From from)
 {
   int err = 0;
-  const auto to = safe_duration_cast::lossless_integral_conversion<To>(from, err);
+  const auto to =
+    safe_duration_cast::lossless_integral_conversion<To>(from, err);
   REQUIRE(err != 0);
 }
 
@@ -81,7 +83,8 @@ void
 verifyErrorOrCorrect(const From from)
 {
   int err = 0;
-  const auto to = safe_duration_cast::lossless_integral_conversion<To>(from, err);
+  const auto to =
+    safe_duration_cast::lossless_integral_conversion<To>(from, err);
   if (err) {
     REQUIRE(err != 0);
   } else {

@@ -116,6 +116,6 @@ TEST_CASE("floating point sunshine downscale")
 
 // FIXME - inf
 
-// FIXME - known to overflow
+// FIXME - known to overflow (towards +inf)
 
-// FIXME - known to underflow
+// FIXME - known to underflow (towards -inf)
