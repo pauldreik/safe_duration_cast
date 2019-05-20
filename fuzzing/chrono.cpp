@@ -98,12 +98,6 @@ doit(const uint8_t* Data, std::size_t Size)
     using R = decltype(a);
     use_different_rep<Item1, R, Item2>(item1);
   });
-  // use_same_rep<Item,std::yocto>(item);
-  // use_same_rep<Item,std::zepto>(item);
-
-  use_different_rep<Item1, std::kilo, Item2>(item1);
-  // use_same_rep<Item,std::zeta>(item);
-  // use_same_rep<Item,std::yotta>(item);
 }
 
 extern "C" int

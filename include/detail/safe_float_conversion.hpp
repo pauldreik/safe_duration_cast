@@ -45,7 +45,7 @@ safe_float_conversion(From from, int& ec)
     return {};
   }
 
-  // nan and inf will be preserved?
+  // nan and inf will be preserved
   return static_cast<To>(from);
 } // function
 

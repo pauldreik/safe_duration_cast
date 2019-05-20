@@ -17,6 +17,10 @@
 #include <tuple>
 #include <utility>
 
+// for finding floating point exceptions quick and nailing
+// down where bad conversions happen
+#define CHECK_FP_EXCEPTION assert(std::fetestexcept(FE_INVALID) == 0)
+
 namespace foreach_detail {
 template<class Tup, class Func, std::size_t... Is>
 constexpr void
@@ -40,7 +44,7 @@ static_foreach(const std::tuple<T...>& t, Func&& f)
     t, std::forward<Func>(f), std::make_index_sequence<tuple_size>{});
 }
 auto
-makeBoostLargeFloat()
+makeLargeBoostFloat()
 {
   using namespace boost::multiprecision;
   return number<backends::cpp_bin_float<237,
@@ -55,71 +59,70 @@ template<typename FromRep, typename Ratio, typename ToRep, typename RatioTo>
 void
 use_different_rep(const FromRep item)
 {
-  assert(std::fetestexcept(FE_INVALID) == 0);
-
+  CHECK_FP_EXCEPTION;
   using From = std::chrono::duration<FromRep, Ratio>;
   const From from{ item };
   using To = std::chrono::duration<ToRep, RatioTo>;
 
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  CHECK_FP_EXCEPTION;
   int ec;
   const auto to = safe_duration_cast::safe_duration_cast<To>(from, ec);
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  CHECK_FP_EXCEPTION;
 
   if (ec) {
     // could not convert, fine
     return;
   }
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  CHECK_FP_EXCEPTION;
 
-  if(std::isinf(from.count())) {
-	  assert(std::isinf(to.count()));
-	  return;
+  if (std::isinf(from.count())) {
+    assert(std::isinf(to.count()));
+    return;
   }
   std::feclearexcept(FE_ALL_EXCEPT);
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  CHECK_FP_EXCEPTION;
 
   // could convert. let's check the result is as expected
   using LargeFloat = decltype(
-    makeBoostLargeFloat()); // boost::multiprecision::cpp_bin_float_double_extended;
+    makeLargeBoostFloat()); // boost::multiprecision::cpp_bin_float_double_extended;
   using K = typename std::ratio_divide<Ratio, RatioTo>::type;
   const LargeFloat b = [=]() {
-    assert(std::fetestexcept(FE_INVALID) == 0);
+    CHECK_FP_EXCEPTION;
     LargeFloat tmp{ item };
     // seems like this sets exceptions. clear them.
     std::feclearexcept(FE_ALL_EXCEPT);
-    assert(std::fetestexcept(FE_INVALID) == 0);
+    CHECK_FP_EXCEPTION;
     tmp *= LargeFloat{ K::num };
-    assert(std::fetestexcept(FE_INVALID) == 0);
+    CHECK_FP_EXCEPTION;
     tmp /= LargeFloat{ K::den };
-    assert(std::fetestexcept(FE_INVALID) == 0);
+    CHECK_FP_EXCEPTION;
     return tmp;
   }();
 
   const LargeFloat absdiff = b - LargeFloat{ to.count() };
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  CHECK_FP_EXCEPTION;
   const LargeFloat absb = b < 0 ? -b : b; // std::abs(b);
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  CHECK_FP_EXCEPTION;
   // if we are finite and above the subnormal range, do a relative check of
   // the result
-  if (/*std::isfinite(absb) &&*/ absb > std::numeric_limits<FromRep>::min() &&
+  if (absb > std::numeric_limits<FromRep>::min() &&
       absb > std::numeric_limits<ToRep>::min()) {
     const LargeFloat reldiff = absdiff / absb;
-    assert(std::fetestexcept(FE_INVALID) == 0);
+    CHECK_FP_EXCEPTION;
     const auto tol1 = std::numeric_limits<FromRep>::epsilon() * 2;
     const auto tol2 = std::numeric_limits<ToRep>::epsilon() * 2;
-    using TolType=long double;//std::common_type<typename FromRep,typename ToRep>;//::type;
-    const auto tol=std::max(TolType{tol1},TolType{tol2});
-    assert(std::fetestexcept(FE_INVALID) == 0);
+    using TolType = long double;
+    const auto tol = std::max(TolType{ tol1 }, TolType{ tol2 });
+    CHECK_FP_EXCEPTION;
     if (!(reldiff < tol)) {
-      assert(std::fetestexcept(FE_INVALID) == 0);
+      CHECK_FP_EXCEPTION;
       std::cout << "from=" << from.count() << " to=" << to.count() << " b=" << b
                 << " absdiff=" << absdiff << " reldiff=" << reldiff
                 << " tol=" << tol << '\n';
     }
     assert(reldiff < tol);
   }
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  CHECK_FP_EXCEPTION;
 }
 
 // Item is the underlying type for duration (int, long etc)
@@ -148,6 +151,7 @@ doit(const uint8_t* Data, std::size_t Size)
 extern "C" int
 LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
 {
+  // all initialization should happen only once per fuzzing session
   static bool isinit = []() {
     std::feclearexcept(FE_ALL_EXCEPT);
     return true;
@@ -170,17 +174,17 @@ LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
     if (i == firsttype) {
       static_foreach(fundamental_ints{}, [=](auto j, auto b) {
         if (j == secondtype) {
-          assert(std::fetestexcept(FE_INVALID) == 0);
+          CHECK_FP_EXCEPTION;
 
           using A = std::decay_t<decltype(a)>;
           using B = std::decay_t<decltype(b)>;
           doit<A, B>(Data, Size);
-          assert(std::fetestexcept(FE_INVALID) == 0);
+          CHECK_FP_EXCEPTION;
         }
       });
     }
   });
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  CHECK_FP_EXCEPTION;
   return 0;
 }
 

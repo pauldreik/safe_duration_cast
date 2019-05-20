@@ -51,17 +51,15 @@ safe_duration_cast(From from, int& ec)
 
   constexpr bool From_is_integral = detail::is_integral_duration(From{});
   constexpr bool To_is_integral = detail::is_integral_duration(To{});
-  constexpr bool From_is_floating = detail::is_floating_duration(From{});
-  constexpr bool To_is_floating = detail::is_floating_duration(To{});
   if constexpr (From_is_integral && To_is_integral) {
     const auto to = detail::duration_cast_int2int<To>(from, ec);
     return to;
   }
 
+  constexpr bool From_is_floating = detail::is_floating_duration(From{});
+  constexpr bool To_is_floating = detail::is_floating_duration(To{});
   if constexpr (From_is_floating && To_is_floating) {
-    assert(std::fetestexcept(FE_INVALID) == 0);
     const auto to = detail::duration_cast_float2float<To>(from, ec);
-    assert(std::fetestexcept(FE_INVALID) == 0);
     return to;
   }
 
