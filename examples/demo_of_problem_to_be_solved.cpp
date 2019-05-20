@@ -6,6 +6,7 @@
  * at your option).
  */
 #include <cassert>
+#include <cfloat>
 #include <chrono>
 #include <chronoconv.hpp>
 #include <climits>
@@ -15,7 +16,7 @@
 #include <type_traits>
 
 void
-example1_wrong_result()
+example1_wrong_result_after_overflow()
 {
   using Sec = std::chrono::duration<int>;
   using mSec = std::chrono::duration<int, std::milli>;
@@ -29,7 +30,7 @@ example1_wrong_result()
 }
 
 void
-example2_undefined_behaviour()
+example2_undefined_behaviour_inside_chrono()
 {
   using Sec = std::chrono::duration<long long>;
   using mSec = std::chrono::duration<long long, std::milli>;
@@ -45,7 +46,7 @@ example2_undefined_behaviour()
 }
 
 void
-example3_wrong_result()
+example3_result_doesnt_fit()
 {
   using Sec = std::chrono::duration<double>;
   using mSec = std::chrono::duration<int, std::milli>;
@@ -64,10 +65,29 @@ example3_wrong_result()
   assert(std::abs(diff_ms) <= 1000 && "oops, wrong answer!");
 }
 
+void
+example4_overflow_to_inf()
+{
+  using Sec = std::chrono::duration<float>;
+  using mSec = std::chrono::duration<float, std::milli>;
+
+  // we will get inf as a result for this case.
+  const double expected_ms = FLT_MAX;
+  const Sec from{
+    expected_ms / 1000 * (1.0f + std::numeric_limits<float>::epsilon())
+  }; // - works fine, + overflows
+  const mSec to = std::chrono::duration_cast<mSec>(from);
+  const auto diff_ms = to.count() - expected_ms;
+  std::cout << " from=" << from.count() << "s to=" << to.count()
+            << "ms diff=" << diff_ms << "ms\n";
+  assert(std::abs(diff_ms) / expected_ms <= 1e-6 && "oops, wrong answer!");
+}
+
 int
 main(int argc, char* argv[])
 {
-  //  example1_wrong_result();
-  // example2_undefined_behaviour();
-  example3_wrong_result();
+  // example1_wrong_result_after_overflow();
+  // example2_undefined_behaviour_inside_chrono();
+  // example3_result_doesnt_fit();
+  example4_overflow_to_inf();
 }
