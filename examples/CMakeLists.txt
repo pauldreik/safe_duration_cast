@@ -4,7 +4,7 @@
 # at your option).
 # By Paul Dreik 20181008
 
-set(sources "basic;")
+set(sources "basic;demo_of_problem_to_be_solved")
 
 foreach(name ${sources})
   add_executable(${name} ${name})

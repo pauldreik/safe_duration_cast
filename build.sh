@@ -14,6 +14,13 @@ cmake .. -GNinja
 ninja
 fi
 
+#make a sanitizer build
+mkdir "$root/build-sanitizers"
+cd "$root/build-sanitizers"
+CXX=clang++ CXXFLAGS="-fsanitize=undefined,address -g -O0" \
+cmake $root -DBUILD_EXAMPLES=On -DBUILD_FUZZERS=Off -DBUILD_UNITTESTS=On \
+-DCMAKE_BUILD_TYPE=Debug -DFUZZ_LINKMAIN=On -GNinja
+ninja
 
 #make a fuzzer build
 mkdir "$root/build-libfuzzer"
