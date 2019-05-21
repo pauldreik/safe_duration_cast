@@ -12,6 +12,7 @@ set(source_files
    integer_conversions_test.cpp
    chronoconv_integers_test.cpp
    chronoconv_floating_test.cpp
+   bool_representations.cpp
    unittest_main.cpp
    )
       
