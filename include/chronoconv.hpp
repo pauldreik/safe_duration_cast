@@ -68,8 +68,12 @@ safe_duration_cast(From from, int& ec)
   static_assert(!(From_is_floating && To_is_integral),
                 "float->integral not supported yet");
 
-  // fallback to std for cases not caught above
-  return std::chrono::duration_cast<To>(from);
+  static_assert(From_is_floating || From_is_integral || To_is_floating ||
+                  To_is_integral,
+                "conversion between non-arithemtic representations (see "
+                "std::is_arithmetic<>) is not supported");
+
+  return To{};
 }
 
 #if SAFE_CHRONO_CONV_HAVE_EXCEPTIONS
