@@ -33,6 +33,7 @@ testAll()
     float tmp;
     std::memcpy(&tmp, &f, sizeof(f));
     const FromDur from{ tmp };
+    std::feclearexcept(FE_ALL_EXCEPT);
     const auto to = safe_duration_cast::safe_duration_cast<ToDur>(from, ec);
     if (ec == 0) {
       const auto ref = std::chrono::duration_cast<ToDur>(from);
