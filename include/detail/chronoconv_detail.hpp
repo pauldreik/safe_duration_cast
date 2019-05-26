@@ -20,6 +20,37 @@
 namespace safe_duration_cast {
 
 namespace detail {
+
+namespace tags {
+struct FromIsInt
+{};
+struct ToIsInt
+{};
+struct FromIsFloat
+{};
+struct ToIsFloat
+{};
+struct NotArithmetic
+{};
+} // namespace tags
+
+// like std::conditional, but with an extra condition
+// if B1
+//   type is T
+// elseif B2
+//   type is E
+// else
+//   type is F
+template<bool B1, class T, bool B2, class E, class F>
+struct conditional3 : std::conditional<B2, E, F>
+{};
+
+template<class T, bool B2, class E, class F>
+struct conditional3<true, T, B2, E, F>
+{
+  using type = T;
+};
+
 template<typename Rep, typename Period>
 constexpr bool is_duration(std::chrono::duration<Rep, Period>)
 {
@@ -53,7 +84,7 @@ is_floating_duration(...)
 
 template<typename To, typename From>
 constexpr To
-duration_cast_int2int(From from, int& ec)
+safe_duration_cast_dispatch(From from, int& ec, tags::FromIsInt, tags::ToIsInt)
 {
   static_assert(is_integral_duration(From{}), "from must be integral");
   static_assert(is_integral_duration(To{}), "to must be integral");
@@ -106,6 +137,8 @@ duration_cast_int2int(From from, int& ec)
   return To{ tocount };
 }
 
+// converts From to To, asserting no floating point exceptions
+// have happened.
 template<typename To, typename From>
 To
 convert_and_check_cfenv(From from)
@@ -131,7 +164,10 @@ convert_and_check_cfenv(From from)
 
 template<typename To, typename From>
 constexpr To
-duration_cast_float2float(From from, int& ec)
+safe_duration_cast_dispatch(From from,
+                            int& ec,
+                            tags::FromIsFloat,
+                            tags::ToIsFloat)
 {
   static_assert(is_floating_duration(From{}), "from must be floating point");
   static_assert(is_floating_duration(To{}), "to must be floating point");
