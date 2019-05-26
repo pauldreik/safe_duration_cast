@@ -13,7 +13,7 @@ struct Outcome
   Count problematic = 0;
 };
 
-template<class From, class To>
+template<class From, class To, class ToPeriod>
 Outcome
 testAll()
 {
@@ -25,7 +25,7 @@ testAll()
   for (From f = min; f != max; ++f) {
     int ec = 0;
     using FromDur = std::chrono::duration<From>;
-    using ToDur = std::chrono::duration<To>;
+    using ToDur = std::chrono::duration<To,ToPeriod>;
     const FromDur from{ f };
     const auto to = safe_duration_cast::safe_duration_cast<ToDur>(from, ec);
     if (ec == 0) {
@@ -38,11 +38,11 @@ testAll()
   }
   return ret;
 }
-template<class From, class To>
+template<class From, class To, class ToPeriod>
 Outcome
 testAllAndPrint()
 {
-  const auto ret = testAll<From, To>();
+  const auto ret = testAll<From, To, ToPeriod>();
   std::cout << __PRETTY_FUNCTION__ << " problematic=" << ret.problematic
             << "\tpassed=" << ret.passed << std::endl;
   return ret;
@@ -74,7 +74,9 @@ main()
       using D1 = decltype(dummy1);
       using D2 = decltype(dummy2);
       if (!std::is_same<D1, D2>()) {
-        testAllAndPrint<D1, D2>();
+          testAllAndPrint<D1, D2, std::ratio<3,5>>();
+          testAllAndPrint<D1, D2, std::ratio<1,1>>();
+          testAllAndPrint<D1, D2, std::ratio<5,3>>();
       }
     });
   });
