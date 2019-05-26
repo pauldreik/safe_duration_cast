@@ -14,13 +14,12 @@ struct Outcome
   Count problematic = 0;
 };
 
-template<class ToPeriod>
+template<class To, class ToPeriod>
 Outcome
 testAll()
 {
   using LoopVar = std::uint32_t;
   using From = float;
-  using To = float;
   static_assert(sizeof(LoopVar) == sizeof(From), "size assumption");
 
   const auto min = std::numeric_limits<LoopVar>::min();
@@ -51,8 +50,11 @@ int
 main()
 {
   std::cout << "Hello World!" << __cplusplus << '\n';
-  testAll<std::ratio<3, 5>>();
-  testAll<std::ratio<1, 1>>();
-  testAll<std::ratio<5, 3>>();
+  testAll<float, std::ratio<3, 5>>();
+  testAll<float, std::ratio<1, 1>>();
+  testAll<float, std::ratio<5, 3>>();
+  testAll<double, std::ratio<3, 5>>();
+  testAll<double, std::ratio<1, 1>>();
+  testAll<double, std::ratio<5, 3>>();
   return 0;
 }
