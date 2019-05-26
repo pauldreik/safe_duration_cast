@@ -41,10 +41,11 @@ namespace safe_duration_cast {
  * types not recognized as either integral or floating point (asking
  * std::numeric_limits), will result in a compilation failure
  */
-template<typename To, typename From>
+template<typename To, typename FromRep, typename FromPeriod>
 constexpr To
-safe_duration_cast(From from, int& ec)
+safe_duration_cast(std::chrono::duration<FromRep, FromPeriod> from, int& ec)
 {
+  using From = std::chrono::duration<FromRep, FromPeriod>;
   ec = 0;
   static_assert(detail::is_duration(From{}), "From is not a duration");
   static_assert(detail::is_duration(To{}), "To is not a duration");
@@ -81,12 +82,12 @@ safe_duration_cast(From from, int& ec)
 
 #if SAFE_CHRONO_CONV_HAVE_EXCEPTIONS
 // throwing version
-template<typename To, typename From>
-To
-safe_duration_cast(From from)
+template<typename To, typename FromRep, typename FromPeriod>
+constexpr To
+safe_duration_cast(std::chrono::duration<FromRep, FromPeriod> from)
 {
   int ec = 0;
-  auto ret = safe_duration_cast<To, From>(from, ec);
+  auto ret = safe_duration_cast<To, FromRep, FromPeriod>(from, ec);
   if (ec) {
     throw std::runtime_error("failed conversion");
   }
