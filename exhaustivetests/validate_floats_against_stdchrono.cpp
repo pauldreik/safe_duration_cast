@@ -3,6 +3,7 @@
 #include "chronoconv.hpp"
 
 #include <cassert>
+#include <cmath>
 #include <cstring>
 #include <limits>
 
@@ -35,9 +36,17 @@ testAll()
     const auto to = safe_duration_cast::safe_duration_cast<ToDur>(from, ec);
     if (ec == 0) {
       const auto ref = std::chrono::duration_cast<ToDur>(from);
-      if(to != ref) {
-	std::cout<<"failed test in "<<__PRETTY_FUNCTION__<<": loopvar="<<f<<"="<<tmp<<" to="<<to.count()<<" ref="<<ref.count()<<std::endl;
-	std::abort();
+      if (to != ref) {
+        // we come here if to!=ref, or any of them is NaN. if any is NaN, the
+        // other had better be it too
+        if (std::isnan(to.count()) && std::isnan(ref.count())) {
+          // all is fine.
+        } else {
+          std::cout << "failed test in " << __PRETTY_FUNCTION__
+                    << ": loopvar=" << f << "=" << tmp << " to=" << to.count()
+                    << " ref=" << ref.count() << std::endl;
+          std::abort();
+        }
       }
       ++ret.passed;
     } else {
