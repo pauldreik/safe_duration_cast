@@ -39,7 +39,7 @@ safe_float_conversion(From from, int& ec)
 
   // catch the only happy case
   if (std::isfinite(from)) {
-    if (from > T::lowest() && from < T::max()) {
+    if (from >= T::lowest() && from <= T::max()) {
       return static_cast<To>(from);
     }
     // not within range.
