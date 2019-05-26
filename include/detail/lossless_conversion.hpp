@@ -10,11 +10,14 @@
 
 #include <limits>
 
-#if __cplusplus >= 201700
-#define CONSTEXPR_IF constexpr
+// see
+// https://en.cppreference.com/w/User:D41D8CD98F/feature_testing_macros#C.2B.2B17
+#if __cpp_if_constexpr >= 201606
+#define SDC_CONSTEXPR_IF constexpr
 #else
-#define CONSTEXPR_IF
+#define SDC_CONSTEXPR_IF
 #endif
+
 namespace safe_duration_cast {
 
 /**
@@ -32,11 +35,11 @@ lossless_integral_conversion(From from, int& ec)
   static_assert(T::is_integer, "To must be integral");
 
   if
-    CONSTEXPR_IF(F::is_signed == T::is_signed)
+    SDC_CONSTEXPR_IF(F::is_signed == T::is_signed)
     {
       // A and B are both signed, or both unsigned.
       if
-        CONSTEXPR_IF(F::digits <= T::digits)
+        SDC_CONSTEXPR_IF(F::digits <= T::digits)
         {
           // From fits in To without any problem
         }
@@ -51,7 +54,7 @@ lossless_integral_conversion(From from, int& ec)
     }
 
   if
-    CONSTEXPR_IF(F::is_signed && !T::is_signed)
+    SDC_CONSTEXPR_IF(F::is_signed && !T::is_signed)
     {
       // From may be negative, not allowed!
       if (from < 0) {
@@ -61,7 +64,7 @@ lossless_integral_conversion(From from, int& ec)
 
       // From is positive. Can it always fit in To?
       if
-        CONSTEXPR_IF(F::digits <= T::digits)
+        SDC_CONSTEXPR_IF(F::digits <= T::digits)
         {
           // yes, From always fits in To.
         }
@@ -75,11 +78,11 @@ lossless_integral_conversion(From from, int& ec)
     }
 
   if
-    CONSTEXPR_IF(!F::is_signed && T::is_signed)
+    SDC_CONSTEXPR_IF(!F::is_signed && T::is_signed)
     {
       // can from be held in To?
       if
-        CONSTEXPR_IF(F::digits < T::digits)
+        SDC_CONSTEXPR_IF(F::digits < T::digits)
         {
           // yes, From always fits in To.
         }

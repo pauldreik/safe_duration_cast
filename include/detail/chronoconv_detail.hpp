@@ -114,7 +114,7 @@ convert_and_check_cfenv(From from)
   static_assert(std::is_floating_point<From>::value);
   To count = from;
   if
-    CONSTEXPR_IF(std::is_floating_point<To>::value)
+    SDC_CONSTEXPR_IF(std::is_floating_point<To>::value)
     {
       // conversion float -> float
       if (std::fetestexcept(FE_INVALID) != 0) {
