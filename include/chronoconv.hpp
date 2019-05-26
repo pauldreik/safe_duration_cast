@@ -42,35 +42,44 @@ namespace safe_duration_cast {
  * std::numeric_limits), will be directed to std::chrono::duration_cast
  */
 namespace tags {
-struct FromIsInt{};
-struct ToIsInt{};
-struct FromIsFloat{};
-struct ToIsFloat{};
-struct NotArithmetic{};
+struct FromIsInt
+{};
+struct ToIsInt
+{};
+struct FromIsFloat
+{};
+struct ToIsFloat
+{};
+struct NotArithmetic
+{};
 }
 // if B1, type is T, elseif B2, type is E, else type is F
 template<bool B1, class T, bool B2, class E, class F>
-struct conditional3 : std::conditional<B2,E,F> {
-};
+struct conditional3 : std::conditional<B2, E, F>
+{};
 
 template<class T, bool B2, class E, class F>
-struct conditional3<true,T, B2, E, F> {
-    using type=T;
+struct conditional3<true, T, B2, E, F>
+{
+  using type = T;
 };
 
 template<typename To, typename From>
 constexpr To
-safe_duration_cast_dispatch(From from, int& ec,tags::FromIsInt,tags::ToIsInt)
+safe_duration_cast_dispatch(From from, int& ec, tags::FromIsInt, tags::ToIsInt)
 {
-    const auto to = detail::duration_cast_int2int<To>(from, ec);
-    return to;
+  const auto to = detail::duration_cast_int2int<To>(from, ec);
+  return to;
 }
 template<typename To, typename From>
 constexpr To
-safe_duration_cast_dispatch(From from, int& ec,tags::FromIsFloat,tags::ToIsFloat)
+safe_duration_cast_dispatch(From from,
+                            int& ec,
+                            tags::FromIsFloat,
+                            tags::ToIsFloat)
 {
-    const auto to = detail::duration_cast_float2float<To>(from, ec);
-    return to;
+  const auto to = detail::duration_cast_float2float<To>(from, ec);
+  return to;
 }
 template<typename To, typename From>
 constexpr To
@@ -95,11 +104,18 @@ safe_duration_cast(From from, int& ec)
                 "conversion between non-arithemtic representations (see "
                 "std::is_arithmetic<>) is not supported");
 
-  using FromTag=typename conditional3<From_is_integral,tags::FromIsInt,From_is_floating,tags::FromIsFloat, tags::NotArithmetic>::type;
-  using ToTag=typename conditional3<To_is_integral,tags::ToIsInt,To_is_floating,tags::ToIsFloat, tags::NotArithmetic>::type;
-  return safe_duration_cast<To>(from,ec,FromTag{},ToTag{});
+  using FromTag = typename conditional3<From_is_integral,
+                                        tags::FromIsInt,
+                                        From_is_floating,
+                                        tags::FromIsFloat,
+                                        tags::NotArithmetic>::type;
+  using ToTag = typename conditional3<To_is_integral,
+                                      tags::ToIsInt,
+                                      To_is_floating,
+                                      tags::ToIsFloat,
+                                      tags::NotArithmetic>::type;
+  return safe_duration_cast<To>(from, ec, FromTag{}, ToTag{});
 }
-
 
 #if SAFE_CHRONO_CONV_HAVE_EXCEPTIONS
 // throwing version

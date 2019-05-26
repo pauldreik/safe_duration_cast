@@ -113,13 +113,16 @@ convert_and_check_cfenv(From from)
   assert(std::fetestexcept(FE_INVALID) == 0);
   static_assert(std::is_floating_point<From>::value);
   To count = from;
-  if CONSTEXPR_IF (std::is_floating_point<To>::value) {
-    // conversion float -> float
-    if (std::fetestexcept(FE_INVALID) != 0) {
-      std::cout << "From=" << from << '\n';
+  if
+    CONSTEXPR_IF(std::is_floating_point<To>::value)
+    {
+      // conversion float -> float
+      if (std::fetestexcept(FE_INVALID) != 0) {
+        std::cout << "From=" << from << '\n';
+      }
+      assert(std::fetestexcept(FE_INVALID) == 0);
     }
-    assert(std::fetestexcept(FE_INVALID) == 0);
-  } else {
+  else {
     // conversion float->integer
     assert(std::fetestexcept(FE_INVALID) == 0);
   }
