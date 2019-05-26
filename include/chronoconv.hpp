@@ -101,7 +101,7 @@ safe_duration_cast(From from, int& ec)
 
   static_assert(From_is_floating || From_is_integral || To_is_floating ||
                   To_is_integral,
-                "conversion between non-arithemtic representations (see "
+                "conversion between non-arithmetic representations (see "
                 "std::is_arithmetic<>) is not supported");
 
   using FromTag = typename conditional3<From_is_integral,
