@@ -4,7 +4,7 @@
 # at your option).
 # By Paul Dreik 20181008
 
-set(sources "validate_against_stdchrono.cpp;")
+set(sources "validate_against_stdchrono;validate_floats_against_stdchrono;")
 
 foreach(name ${sources})
   add_executable(${name} ${name})
