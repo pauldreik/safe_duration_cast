@@ -18,7 +18,8 @@
 namespace safe_duration_cast {
 /**
  * A safe version of std::chrono_duration_cast, reporting an error instead
- * of invoking undefined behaviour through internal overflows and casts.
+ * of returning the wrong result or invoking undefined behaviour through
+ * internal overflows and casts.
  *
  * if the conversion is from an integral type to another - all types of error
  * are caught, that is, either the correct result is obtained, or the error flag
@@ -39,7 +40,7 @@ namespace safe_duration_cast {
  * compile.
  *
  * types not recognized as either integral or floating point (asking
- * std::numeric_limits), will result in a compilation failure
+ * std::numeric_limits), will result in a compilation failure.
  */
 template<typename To, typename FromRep, typename FromPeriod>
 constexpr To
