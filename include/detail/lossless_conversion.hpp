@@ -10,18 +10,8 @@
 
 #include <limits>
 
-// see
-// https://en.cppreference.com/w/User:D41D8CD98F/feature_testing_macros#C.2B.2B17
-#if __cpp_if_constexpr >= 201606
-#define SDC_CONSTEXPR_IF constexpr
-#else
-#define SDC_CONSTEXPR_IF
-#endif
-#if __cpp_constexpr >= 201304
-#define SDC_RELAXED_CONSTEXPR constexpr
-#else
-#define SDC_RELAXED_CONSTEXPR
-#endif
+#include "stdutils.hpp"
+
 namespace safe_duration_cast {
 
 /**

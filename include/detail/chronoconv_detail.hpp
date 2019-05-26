@@ -16,6 +16,7 @@
 
 #include <detail/lossless_conversion.hpp>
 #include <detail/safe_float_conversion.hpp>
+#include <detail/stdutils.hpp>
 
 namespace safe_duration_cast {
 

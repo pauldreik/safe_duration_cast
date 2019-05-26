@@ -7,6 +7,7 @@
  */
 
 #include <detail/chronoconv_detail.hpp>
+#include <detail/stdutils.hpp>
 
 // support compiling with exceptions disabled
 // this works in gcc>=5 and clang>=3.6 (have not tested visual studio)
