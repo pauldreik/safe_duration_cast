@@ -115,8 +115,8 @@ template<typename Int>
 void
 verifyFitsInUnsigned()
 {
-  using Unsigned = std::make_unsigned_t<Int>;
-  using Signed = std::make_signed_t<Int>;
+  using Unsigned = typename std::make_unsigned<Int>::type;
+  using Signed = typename std::make_signed<Int>::type;
 
   // going from unsigned to signed, the good cases
   verifyLossless<Unsigned, Signed>(0);
@@ -216,10 +216,10 @@ template<typename From, typename To>
 void
 verifyConversionsDepth3()
 {
-  using UnsignedTo = std::make_unsigned_t<To>;
-  using SignedTo = std::make_signed_t<To>;
-  using UnsignedFrom = std::make_unsigned_t<From>;
-  using SignedFrom = std::make_signed_t<From>;
+  using UnsignedTo = typename std::make_unsigned<To>::type;
+  using SignedTo = typename std::make_signed<To>::type;
+  using UnsignedFrom = typename std::make_unsigned<From>::type;
+  using SignedFrom = typename std::make_signed<From>::type;
 
   verifyConversionsDepth4<UnsignedFrom, UnsignedTo>();
   verifyConversionsDepth4<UnsignedFrom, SignedTo>();

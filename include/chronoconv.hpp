@@ -43,7 +43,7 @@ namespace safe_duration_cast {
  * std::numeric_limits), will result in a compilation failure.
  */
 template<typename To, typename FromRep, typename FromPeriod>
-constexpr To
+SDC_RELAXED_CONSTEXPR To
 safe_duration_cast(std::chrono::duration<FromRep, FromPeriod> from, int& ec)
 {
   using From = std::chrono::duration<FromRep, FromPeriod>;
@@ -78,13 +78,13 @@ safe_duration_cast(std::chrono::duration<FromRep, FromPeriod> from, int& ec)
                                   To_is_floating,
                                   detail::tags::ToIsFloat,
                                   detail::tags::NotArithmetic>::type;
-  return safe_duration_cast<To>(from, ec, FromTag{}, ToTag{});
+  return detail::safe_duration_cast_dispatch<To>(from, ec, FromTag{}, ToTag{});
 }
 
 #if SAFE_CHRONO_CONV_HAVE_EXCEPTIONS
 // throwing version
 template<typename To, typename FromRep, typename FromPeriod>
-constexpr To
+SDC_RELAXED_CONSTEXPR To
 safe_duration_cast(std::chrono::duration<FromRep, FromPeriod> from)
 {
   int ec = 0;

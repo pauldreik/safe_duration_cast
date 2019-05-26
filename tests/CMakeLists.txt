@@ -59,6 +59,6 @@ endif()
 
 target_link_libraries(safe_duration_cast_test PUBLIC chronoconv)
 target_include_directories(safe_duration_cast_test PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set_property(TARGET safe_duration_cast_test PROPERTY CXX_STANDARD 17)
+#set_property(TARGET safe_duration_cast_test PROPERTY CXX_STANDARD 17)
 
 add_test(NAME test COMMAND safe_duration_cast_test)

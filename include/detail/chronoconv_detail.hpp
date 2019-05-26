@@ -83,7 +83,7 @@ is_floating_duration(...)
 }
 
 template<typename To, typename From>
-constexpr To
+SDC_RELAXED_CONSTEXPR To
 safe_duration_cast_dispatch(From from, int& ec, tags::FromIsInt, tags::ToIsInt)
 {
   static_assert(is_integral_duration(From{}), "from must be integral");
@@ -144,7 +144,7 @@ To
 convert_and_check_cfenv(From from)
 {
   assert(std::fetestexcept(FE_INVALID) == 0);
-  static_assert(std::is_floating_point<From>::value);
+  static_assert(std::is_floating_point<From>::value, "");
   To count = from;
   if
     SDC_CONSTEXPR_IF(std::is_floating_point<To>::value)
@@ -163,7 +163,7 @@ convert_and_check_cfenv(From from)
 }
 
 template<typename To, typename From>
-constexpr To
+SDC_RELAXED_CONSTEXPR To
 safe_duration_cast_dispatch(From from,
                             int& ec,
                             tags::FromIsFloat,

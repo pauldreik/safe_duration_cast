@@ -17,7 +17,11 @@
 #else
 #define SDC_CONSTEXPR_IF
 #endif
-
+#if __cpp_constexpr >= 201304
+#define SDC_RELAXED_CONSTEXPR constexpr
+#else
+#define SDC_RELAXED_CONSTEXPR
+#endif
 namespace safe_duration_cast {
 
 /**
@@ -25,7 +29,7 @@ namespace safe_duration_cast {
  * can't be converted to To without loss, ec is set.
  */
 template<typename To, typename From>
-constexpr To
+SDC_RELAXED_CONSTEXPR To
 lossless_integral_conversion(From from, int& ec)
 {
   ec = 0;

@@ -27,7 +27,7 @@ namespace safe_duration_cast {
  * -Inf                             | -Inf
  */
 template<typename To, typename From>
-constexpr To
+SDC_RELAXED_CONSTEXPR To
 safe_float_conversion(From from, int& ec)
 {
   ec = 0;

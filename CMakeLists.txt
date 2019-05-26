@@ -21,7 +21,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/include/chronoconv.hpp
 set(target_name chronoconv)
 
 add_library(${target_name} INTERFACE)
-#target_compile_features(${target_name}     INTERFACE cxx_std_17)
+target_compile_features(${target_name}     INTERFACE cxx_std_11)
 target_sources(${target_name}              INTERFACE $<BUILD_INTERFACE:${detail_header_files} ${header_files}>)
 target_include_directories(${target_name}  INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
 target_include_directories(${target_name}  SYSTEM INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
@@ -41,7 +41,7 @@ endif()
 
 
 #unit tests (on by default)
-option(BUILD_UNITTESTS "enables the unit tests" On)
+option(BUILD_UNITTESTS "enables the unit tests" Off)
 if(BUILD_UNITTESTS)
    enable_testing()
    add_subdirectory(tests/)
@@ -55,7 +55,7 @@ endif()
 
 
 #fuzzing
-option(BUILD_FUZZERS "enables building the fuzzers" On)
+option(BUILD_FUZZERS "enables building the fuzzers" Off)
 if(BUILD_FUZZERS)
    add_subdirectory(fuzzing)
 endif()

@@ -79,7 +79,7 @@ verifyInf(Rep inf)
   const auto to =
     safe_duration_cast::safe_duration_cast<Milli>(Micro{ inf }, err);
   REQUIRE(err == 0);
-  static_assert(std::numeric_limits<Rep>::has_infinity);
+  static_assert(std::numeric_limits<Rep>::has_infinity, "");
   REQUIRE(std::isinf(to.count()));
 }
 TEST_CASE("float inf should give inf")
