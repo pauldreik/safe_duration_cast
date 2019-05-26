@@ -31,7 +31,7 @@ export CXX
 export CXXFLAGS	
 
 #make a sanitizers debug build with the default compiler, C++17
-CXXFLAGS="-fsanitize=undefined,address -g -O0 -std=c++1z"
+CXXFLAGS="-fsanitize=undefined,address -g -O0 -std=c++1z -Wall -Wextra"
 dobuild sanitizers_17 \
 -DBUILD_EXAMPLES=On \
 -DBUILD_FUZZERS=Off \
@@ -40,7 +40,7 @@ dobuild sanitizers_17 \
 -DFUZZ_LINKMAIN=On
 
 #make sure the examples can be built with c++11
-CXXFLAGS="-g -O0 -std=c++11"
+CXXFLAGS="-g -O0 -std=c++11 -Wall -Wextra"
 dobuild normal_cpp11 \
 -DBUILD_EXAMPLES=On \
 -DBUILD_FUZZERS=Off \
