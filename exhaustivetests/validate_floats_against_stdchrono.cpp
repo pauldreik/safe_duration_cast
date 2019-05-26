@@ -35,7 +35,10 @@ testAll()
     const auto to = safe_duration_cast::safe_duration_cast<ToDur>(from, ec);
     if (ec == 0) {
       const auto ref = std::chrono::duration_cast<ToDur>(from);
-      assert(to == ref);
+      if(to != ref) {
+	std::cout<<"failed test in "<<__PRETTY_FUNCTION__<<": loopvar="<<f<<"="<<tmp<<" to="<<to.count()<<" ref="<<ref.count()<<std::endl;
+	std::abort();
+      }
       ++ret.passed;
     } else {
       ++ret.problematic;

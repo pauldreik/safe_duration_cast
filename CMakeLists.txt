@@ -22,9 +22,9 @@ set(target_name chronoconv)
 
 add_library(${target_name} INTERFACE)
 #target_compile_features(${target_name}     INTERFACE cxx_std_11)
-target_sources(${target_name}              INTERFACE $<BUILD_INTERFACE:${detail_header_files} ${header_files}>)
-target_include_directories(${target_name}  INTERFACE $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/>)
-target_include_directories(${target_name}  SYSTEM INTERFACE $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>)
+target_sources(${target_name}              INTERFACE ${detail_header_files} ${header_files})
+target_include_directories(${target_name}  INTERFACE include/)
+target_include_directories(${target_name}  SYSTEM INTERFACE include)
 target_compile_definitions(${target_name}  INTERFACE)
 
 #for installation
