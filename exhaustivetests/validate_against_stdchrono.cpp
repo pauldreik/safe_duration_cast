@@ -61,7 +61,6 @@ onEach(F&& f)
   using us = unsigned short;
   f(us{});
   f(int{});
-  return;
   f(unsigned{});
 }
 
