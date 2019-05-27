@@ -113,16 +113,20 @@ findLowestNonproblematicInput()
   return FromDuration{ max };
 }
 
+template<bool usestdchrono>
 int
-main(int /*argc*/, char* argv[])
+doit(int /*argc*/, char* argv[])
 {
+
   using From = std::chrono::duration<std::uint64_t>;
   using To = std::chrono::duration<std::uint64_t, std::ratio<3, 5>>;
 
   constexpr auto minsafe = findLowestNonproblematicInput<From, To>();
   constexpr auto maxsafe = findLargestNonproblematicInput<From, To>();
+  /*
   std::cout << "safe input range is " << minsafe.count() << " to "
             << maxsafe.count() << '\n';
+*/
 
   // initialize the rng to something the compiler cant know
   Lehmer rng(argv[0], std::strlen(argv[0]));
@@ -138,14 +142,29 @@ main(int /*argc*/, char* argv[])
     const auto input = dist(rng); // rng.get();
     int ec;
     const auto from = From{ input };
-    const auto result = safe_duration_cast::safe_duration_cast<To>(from, ec);
-    if (ec == 0) {
+    if (usestdchrono) {
+      const auto result = safe_duration_cast::safe_duration_cast<To>(from, ec);
+      if (ec == 0) {
+        dummycount += result.count() & 0x1;
+      }
+    } else {
+      const auto result = std::chrono::duration_cast<To>(from);
       dummycount += result.count() & 0x1;
     }
   }
   const auto t1 = std::chrono::steady_clock::now();
   const auto elapsed_seconds =
     std::chrono::duration_cast<std::chrono::duration<double>>(t1 - t0).count();
-  std::cout << "speed: " << iterations / elapsed_seconds
+  std::cout << (usestdchrono ? "std::chrono::duration_cast"
+                             : "safe_duration_cast")
+            << " speed:\t" << iterations / elapsed_seconds
             << " operations per second, dummy=" << dummycount << "\n";
+  return 0;
+}
+
+int
+main(int argc, char* argv[])
+{
+  doit<false>(argc, argv);
+  doit<true>(argc, argv);
 }
