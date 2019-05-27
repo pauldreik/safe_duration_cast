@@ -60,6 +60,17 @@ dobuild libfuzzer_with_sanitizers \
 -DFUZZ_LINKMAIN=Off \
 -DFUZZ_LDFLAGS=-fsanitize=fuzzer
 
+#make a speed measurement build
+CXXFLAGS="-std=c++1z -Wall -Wextra"
+dobuild speedtest \
+-DBUILD_EXAMPLES=Off \
+-DBUILD_FUZZERS=Off \
+-DBUILD_UNITTESTS=Off \
+-DBUILD_SPEED_TESTS=On \
+-DBUILD_EXHAUSTIVE_TESTS=Off \
+-DCMAKE_BUILD_TYPE=Release \
+-DFUZZ_LINKMAIN=On
+
 echo $me: all tests passed
 exit 0
 

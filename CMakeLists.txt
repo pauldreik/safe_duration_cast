@@ -53,6 +53,13 @@ if(BUILD_EXHAUSTIVE_TESTS)
    add_subdirectory(exhaustivetests/)
 endif()
 
+#speed tests
+option(BUILD_SPEED_TESTS "enables the speed tests" Off)
+if(BUILD_SPEED_TESTS)
+   enable_testing()
+   add_subdirectory(speedtest/)
+endif()
+
 #examples
 option(BUILD_EXAMPLES "enables building the examples" Off)
 if(BUILD_EXAMPLES)
