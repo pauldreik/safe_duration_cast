@@ -94,8 +94,9 @@ runThreaded(const unsigned Nthreads)
   }
   Outcome sum;
   for (unsigned i = 0; i < Nthreads; ++i) {
-    sum.problematic += results[i].get().problematic;
-    sum.passed += results[i].get().passed;
+      const auto Partial=results[i].get();
+    sum.problematic += Partial.problematic;
+    sum.passed += Partial.passed;
   }
   std::cout << __PRETTY_FUNCTION__ << " problematic=" << sum.problematic
             << "\tpassed=" << sum.passed << std::endl;
