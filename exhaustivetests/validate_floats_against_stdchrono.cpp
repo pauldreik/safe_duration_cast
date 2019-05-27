@@ -15,7 +15,10 @@
 #include <cassert>
 #include <cmath>
 #include <cstring>
+#include <future>
 #include <limits>
+#include <thread>
+#include <vector>
 
 using Count = std::int64_t;
 
@@ -27,8 +30,9 @@ struct Outcome
 
 template<class To, class ToPeriod>
 Outcome
-testAll()
+testAll(const unsigned threadIndex, unsigned Nthreads)
 {
+  assert(threadIndex < Nthreads);
   using LoopVar = std::uint32_t;
   using From = float;
   static_assert(sizeof(LoopVar) == sizeof(From), "size assumption");
@@ -67,24 +71,47 @@ testAll()
   // also not overflowing the loop variable
   const auto min = std::numeric_limits<LoopVar>::min();
   const auto max = std::numeric_limits<LoopVar>::max();
-  for (LoopVar f = min; f != max; ++f) {
+  const auto blocksize = (std::uint64_t{ max } - min + 1) / Nthreads;
+  const auto begin = threadIndex * blocksize + min;
+  const auto beforeend = static_cast<LoopVar>(begin + blocksize - 1);
+  for (LoopVar f = static_cast<LoopVar>(begin); f < beforeend; ++f) {
     body(f);
   }
-  body(max);
+  body(beforeend);
 
-  std::cout << __PRETTY_FUNCTION__ << " problematic=" << ret.problematic
-            << "\tpassed=" << ret.passed << std::endl;
   return ret;
+}
+
+template<class To, class ToPeriod>
+Outcome
+runThreaded(const unsigned Nthreads)
+{
+  std::vector<std::future<Outcome>> results(Nthreads);
+
+  for (unsigned i = 0; i < Nthreads; ++i) {
+    results[i] = std::async(
+      std::launch::async, [=]() { return testAll<To, ToPeriod>(i, Nthreads); });
+  }
+  Outcome sum;
+  for (unsigned i = 0; i < Nthreads; ++i) {
+    sum.problematic += results[i].get().problematic;
+    sum.passed += results[i].get().passed;
+  }
+  std::cout << __PRETTY_FUNCTION__ << " problematic=" << sum.problematic
+            << "\tpassed=" << sum.passed << std::endl;
+
+  return sum;
 }
 
 int
 main()
 {
-  testAll<float, std::ratio<3, 5>>();
-  testAll<float, std::ratio<1, 1>>();
-  testAll<float, std::ratio<5, 3>>();
-  testAll<double, std::ratio<3, 5>>();
-  testAll<double, std::ratio<1, 1>>();
-  testAll<double, std::ratio<5, 3>>();
+  const auto nthreads = std::thread::hardware_concurrency();
+  runThreaded<float, std::ratio<3, 5>>(nthreads);
+  runThreaded<float, std::ratio<1, 1>>(nthreads);
+  runThreaded<float, std::ratio<5, 3>>(nthreads);
+  runThreaded<double, std::ratio<3, 5>>(nthreads);
+  runThreaded<double, std::ratio<1, 1>>(nthreads);
+  runThreaded<double, std::ratio<5, 3>>(nthreads);
   return 0;
 }
