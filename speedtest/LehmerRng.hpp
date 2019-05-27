@@ -7,7 +7,6 @@
  */
 #pragma once
 
-
 #include <cstring>
 #include <limits>
 
@@ -42,4 +41,3 @@ private:
   // assumes clang or gcc.
   __uint128_t m_state;
 };
-

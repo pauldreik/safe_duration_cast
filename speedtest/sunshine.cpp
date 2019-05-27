@@ -8,12 +8,11 @@
 
 #include "chronoconv.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cstring>
 #include <iostream>
 #include <limits>
-#include <random>
-#include "LehmerRng.hpp"
 
 /**
  * finds the largest input that can be converted from FromDuration to ToDuration
@@ -97,28 +96,21 @@ doit(int /*argc*/, char* argv[])
             << maxsafe.count() << '\n';
 */
 
-  // initialize the rng to something the compiler cant know
-  Lehmer rng(argv[0], std::strlen(argv[0]));
-
-  std::uniform_int_distribution<std::uint64_t> dist(minsafe.count(),
-                                                    maxsafe.count());
-
   const auto t0 = std::chrono::steady_clock::now();
 
   std::uint64_t dummycount = 0;
-  const auto iterations = 400000000U;
-  for (unsigned int i = 0; i < iterations; ++i) {
-    const auto input = dist(rng); // rng.get();
+  const std::uint64_t iterations =
+    std::min(std::uint64_t{ 2000000000ULL }, maxsafe.count());
+  for (std::uint64_t i = 0; i < iterations; ++i) {
+    const std::uint64_t input = i;
     int ec;
     const auto from = From{ input };
-    if (usestdchrono) {
+    if (!usestdchrono) {
       const auto result = safe_duration_cast::safe_duration_cast<To>(from, ec);
-      if (ec == 0) {
-        dummycount += result.count() & 0x1;
-      }
+      dummycount += result.count();
     } else {
       const auto result = std::chrono::duration_cast<To>(from);
-      dummycount += result.count() & 0x1;
+      dummycount += result.count();
     }
   }
   const auto t1 = std::chrono::steady_clock::now();
@@ -134,6 +126,10 @@ doit(int /*argc*/, char* argv[])
 int
 main(int argc, char* argv[])
 {
+  doit<false>(argc, argv);
+  doit<true>(argc, argv);
+  doit<false>(argc, argv);
+  doit<true>(argc, argv);
   doit<false>(argc, argv);
   doit<true>(argc, argv);
 }
