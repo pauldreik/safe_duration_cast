@@ -113,22 +113,27 @@ safe_duration_cast_dispatch(From from, int& ec, tags::FromIsInt, tags::ToIsInt)
     return {};
   }
   // multiply with Factor::num without overflow or underflow
-  constexpr auto max1 =
-    std::numeric_limits<IntermediateRep>::max() / Factor::num;
-  if (count > max1) {
-    ec = 1;
-    return {};
-  }
-  constexpr auto min1 =
-    std::numeric_limits<IntermediateRep>::min() / Factor::num;
-  if (count < min1) {
-    ec = 1;
-    return {};
-  }
-  count *= Factor::num;
+  if
+    SDC_CONSTEXPR_IF(Factor::num != 1)
+    {
+      constexpr auto max1 =
+        std::numeric_limits<IntermediateRep>::max() / Factor::num;
+      if (count > max1) {
+        ec = 1;
+        return {};
+      }
+      constexpr auto min1 =
+        std::numeric_limits<IntermediateRep>::min() / Factor::num;
+      if (count < min1) {
+        ec = 1;
+        return {};
+      }
+      count *= Factor::num;
+    }
 
   // this can't go wrong, right? den>0 is checked earlier.
-  count /= Factor::den;
+  if
+    SDC_CONSTEXPR_IF(Factor::den != 1) { count /= Factor::den; }
   // convert to the to type, safely
   using ToRep = typename To::rep;
   const ToRep tocount = lossless_integral_conversion<ToRep>(count, ec);
@@ -212,23 +217,29 @@ safe_duration_cast_dispatch(From from,
     convert_and_check_cfenv<IntermediateRep>(from.count());
 
   // multiply with Factor::num without overflow or underflow
-  constexpr auto max1 =
-    std::numeric_limits<IntermediateRep>::max() / Factor::num;
-  if (count > max1) {
-    ec = 1;
-    return {};
-  }
-  constexpr auto min1 =
-    std::numeric_limits<IntermediateRep>::lowest() / Factor::num;
-  if (count < min1) {
-    ec = 1;
-    return {};
-  }
-  count *= Factor::num;
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  if
+    SDC_CONSTEXPR_IF(Factor::num != 1)
+    {
+      constexpr auto max1 =
+        std::numeric_limits<IntermediateRep>::max() / Factor::num;
+      if (count > max1) {
+        ec = 1;
+        return {};
+      }
+      constexpr auto min1 =
+        std::numeric_limits<IntermediateRep>::lowest() / Factor::num;
+      if (count < min1) {
+        ec = 1;
+        return {};
+      }
+      count *= Factor::num;
+      assert(std::fetestexcept(FE_INVALID) == 0);
+    }
 
   // this can't go wrong, right? den>0 is checked earlier.
-  count /= Factor::den;
+  if
+    SDC_CONSTEXPR_IF(Factor::den != 1) { count /= Factor::den; }
+
   // convert to the to type, safely
   using ToRep = typename To::rep;
 

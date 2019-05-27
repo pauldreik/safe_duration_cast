@@ -128,8 +128,6 @@ TEST_CASE("long double overflow/underflow should be noticed")
   verifyInternalOverflow(std::numeric_limits<long double>::lowest() / 2);
 }
 
-
-
 /*
  *  make sure the largest finite values are preserved
  */
@@ -139,10 +137,9 @@ verifyIdentity(Rep val)
 {
   using D = std::chrono::duration<Rep>;
   int err;
-  const auto to =
-    safe_duration_cast::safe_duration_cast<D>(D{ val }, err);
+  const auto to = safe_duration_cast::safe_duration_cast<D>(D{ val }, err);
   REQUIRE(err == 0);
-  REQUIRE(to.count()==val);
+  REQUIRE(to.count() == val);
 }
 TEST_CASE("float limits should be preserved")
 {
