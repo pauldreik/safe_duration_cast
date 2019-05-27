@@ -69,10 +69,13 @@ If you have a duration with a representation which is not recognized as [std::is
 In the future, it might be worth considering conversion of supporting types that [support numeric_limits](https://www.boost.org/doc/libs/1_70_0/libs/multiprecision/doc/html/boost_multiprecision/tut/limits.html), like [boost multiprecision](https://www.boost.org/doc/libs/1_70_0/libs/multiprecision/doc/html/index.html).
 
 ## Performance cost
-Not yet measured.
+There is a limited benchmark comparing std::chrono::duration_cast with safe_duration_cast. See the files in [benchmark](speedtest/) which converts uint64 timestamps from period 1 to 5/3.
+The speed difference is smaller than the random fluctuations in measurement, on an optimized build (64 bit gcc 8.3). 
 
 ## Testing
 There are [unit tests](tests) and [fuzz testing](fuzzing). Actually, fuzz testing was used to smoke out all the corner cases. So far it has only been tested on Ubuntu 18.04 64bit, using gcc and clang.
+
+There are also [exhaustive tests](exhaustivetests/) testing each possible 32 bit value for the supported types to make sure the result is either signaled as an error, or consistent with std::chrono::duration_cast.
 
 ## Acknowledgements
 [Arvid Nordberg](https://github.com/arvidn) suggested the use of [cfenv](https://en.cppreference.com/w/cpp/header/cfenv) to search for floating point exceptions, thanks!
