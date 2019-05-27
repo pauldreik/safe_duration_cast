@@ -30,7 +30,7 @@ struct Outcome
 
 template<class To, class ToPeriod>
 Outcome
-testAll(const unsigned threadIndex, unsigned Nthreads)
+testAll(const unsigned threadIndex, const unsigned Nthreads)
 {
   assert(threadIndex < Nthreads);
   using LoopVar = std::uint32_t;
@@ -73,7 +73,13 @@ testAll(const unsigned threadIndex, unsigned Nthreads)
   const auto max = std::numeric_limits<LoopVar>::max();
   const auto blocksize = (std::uint64_t{ max } - min + 1) / Nthreads;
   const auto begin = threadIndex * blocksize + min;
-  const auto beforeend = static_cast<LoopVar>(begin + blocksize - 1);
+  const auto beforeend = [=]() {
+    if (threadIndex + 1 == Nthreads) {
+      return max;
+    } else {
+      return static_cast<LoopVar>(begin + blocksize - 1);
+    }
+  }();
   for (LoopVar f = static_cast<LoopVar>(begin); f < beforeend; ++f) {
     body(f);
   }
@@ -94,7 +100,7 @@ runThreaded(const unsigned Nthreads)
   }
   Outcome sum;
   for (unsigned i = 0; i < Nthreads; ++i) {
-      const auto Partial=results[i].get();
+    const auto Partial = results[i].get();
     sum.problematic += Partial.problematic;
     sum.passed += Partial.passed;
   }
