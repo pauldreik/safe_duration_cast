@@ -30,7 +30,7 @@ CHECK_INCLUDE_FILE_CXX("catch.hpp" CATCH_FOUND)
 if(CATCH_FOUND)
   # System wide install, manual intervention, or works by plain magic.
 else()
-  file(DOWNLOAD https://github.com/catchorg/Catch2/releases/download/v2.4.1/catch.hpp ${CMAKE_CURRENT_SOURCE_DIR}/catch.hpp)
+  file(DOWNLOAD https://github.com/catchorg/Catch2/releases/download/v2.7.2/catch.hpp ${CMAKE_CURRENT_SOURCE_DIR}/catch.hpp)
 endif()
 
 if(VERBOSE_UNITTESTS)
@@ -59,6 +59,6 @@ endif()
 
 target_link_libraries(safe_duration_cast_test PUBLIC chronoconv)
 target_include_directories(safe_duration_cast_test PUBLIC ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set_property(TARGET safe_duration_cast_test PROPERTY CXX_STANDARD 17)
+#set_property(TARGET safe_duration_cast_test PROPERTY CXX_STANDARD 17)
 
 add_test(NAME test COMMAND safe_duration_cast_test)

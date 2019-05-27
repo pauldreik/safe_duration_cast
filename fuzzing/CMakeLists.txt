@@ -28,6 +28,8 @@ if(FUZZ_LDFLAGS)
   target_link_libraries(${name} PRIVATE ${FUZZ_LDFLAGS})
 endif()
   target_compile_features(${name} PRIVATE cxx_generic_lambdas)
+  # need fold expressions
+  target_compile_features(${name} PRIVATE cxx_std_17)
 endmacro()
 
 foreach(X IN ITEMS ${SOURCES})

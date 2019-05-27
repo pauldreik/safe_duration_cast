@@ -79,7 +79,7 @@ verifyInf(Rep inf)
   const auto to =
     safe_duration_cast::safe_duration_cast<Milli>(Micro{ inf }, err);
   REQUIRE(err == 0);
-  static_assert(std::numeric_limits<Rep>::has_infinity);
+  static_assert(std::numeric_limits<Rep>::has_infinity, "");
   REQUIRE(std::isinf(to.count()));
 }
 TEST_CASE("float inf should give inf")
@@ -126,4 +126,36 @@ TEST_CASE("long double overflow/underflow should be noticed")
 {
   verifyInternalOverflow(std::numeric_limits<long double>::max() / 2);
   verifyInternalOverflow(std::numeric_limits<long double>::lowest() / 2);
+}
+
+
+
+/*
+ *  make sure the largest finite values are preserved
+ */
+template<typename Rep>
+void
+verifyIdentity(Rep val)
+{
+  using D = std::chrono::duration<Rep>;
+  int err;
+  const auto to =
+    safe_duration_cast::safe_duration_cast<D>(D{ val }, err);
+  REQUIRE(err == 0);
+  REQUIRE(to.count()==val);
+}
+TEST_CASE("float limits should be preserved")
+{
+  verifyIdentity(std::numeric_limits<float>::max());
+  verifyIdentity(std::numeric_limits<float>::lowest());
+}
+TEST_CASE("double limits should be preserved")
+{
+  verifyIdentity(std::numeric_limits<double>::max());
+  verifyIdentity(std::numeric_limits<double>::lowest());
+}
+TEST_CASE("long doulbe limits should be preserved")
+{
+  verifyIdentity(std::numeric_limits<long double>::max());
+  verifyIdentity(std::numeric_limits<long double>::lowest());
 }

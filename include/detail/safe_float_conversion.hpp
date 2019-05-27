@@ -12,6 +12,8 @@
 #include <limits>
 #include <type_traits>
 
+#include <detail/stdutils.hpp>
+
 namespace safe_duration_cast {
 
 /**
@@ -27,7 +29,7 @@ namespace safe_duration_cast {
  * -Inf                             | -Inf
  */
 template<typename To, typename From>
-constexpr To
+SDC_RELAXED_CONSTEXPR To
 safe_float_conversion(From from, int& ec)
 {
   ec = 0;
@@ -37,7 +39,7 @@ safe_float_conversion(From from, int& ec)
 
   // catch the only happy case
   if (std::isfinite(from)) {
-    if (from > T::lowest() && from < T::max()) {
+    if (from >= T::lowest() && from <= T::max()) {
       return static_cast<To>(from);
     }
     // not within range.

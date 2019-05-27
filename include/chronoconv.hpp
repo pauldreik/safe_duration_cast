@@ -7,6 +7,7 @@
  */
 
 #include <detail/chronoconv_detail.hpp>
+#include <detail/stdutils.hpp>
 
 // support compiling with exceptions disabled
 // this works in gcc>=5 and clang>=3.6 (have not tested visual studio)
@@ -18,7 +19,8 @@
 namespace safe_duration_cast {
 /**
  * A safe version of std::chrono_duration_cast, reporting an error instead
- * of invoking undefined behaviour through internal overflows and casts.
+ * of returning the wrong result or invoking undefined behaviour through
+ * internal overflows and casts.
  *
  * if the conversion is from an integral type to another - all types of error
  * are caught, that is, either the correct result is obtained, or the error flag
@@ -39,29 +41,21 @@ namespace safe_duration_cast {
  * compile.
  *
  * types not recognized as either integral or floating point (asking
- * std::numeric_limits), will be directed to std::chrono::duration_cast
+ * std::numeric_limits), will result in a compilation failure.
  */
-template<typename To, typename From>
-constexpr To
-safe_duration_cast(From from, int& ec)
+template<typename To, typename FromRep, typename FromPeriod>
+SDC_RELAXED_CONSTEXPR To
+safe_duration_cast(std::chrono::duration<FromRep, FromPeriod> from, int& ec)
 {
+  using From = std::chrono::duration<FromRep, FromPeriod>;
   ec = 0;
   static_assert(detail::is_duration(From{}), "From is not a duration");
   static_assert(detail::is_duration(To{}), "To is not a duration");
 
   constexpr bool From_is_integral = detail::is_integral_duration(From{});
   constexpr bool To_is_integral = detail::is_integral_duration(To{});
-  if constexpr (From_is_integral && To_is_integral) {
-    const auto to = detail::duration_cast_int2int<To>(from, ec);
-    return to;
-  }
-
   constexpr bool From_is_floating = detail::is_floating_duration(From{});
   constexpr bool To_is_floating = detail::is_floating_duration(To{});
-  if constexpr (From_is_floating && To_is_floating) {
-    const auto to = detail::duration_cast_float2float<To>(from, ec);
-    return to;
-  }
 
   static_assert(!(From_is_integral && To_is_floating),
                 "integral->float not supported yet");
@@ -70,20 +64,32 @@ safe_duration_cast(From from, int& ec)
 
   static_assert(From_is_floating || From_is_integral || To_is_floating ||
                   To_is_integral,
-                "conversion between non-arithemtic representations (see "
+                "conversion between non-arithmetic representations (see "
                 "std::is_arithmetic<>) is not supported");
 
-  return To{};
+  using FromTag =
+    typename detail::conditional3<From_is_integral,
+                                  detail::tags::FromIsInt,
+                                  From_is_floating,
+                                  detail::tags::FromIsFloat,
+                                  detail::tags::NotArithmetic>::type;
+  using ToTag =
+    typename detail::conditional3<To_is_integral,
+                                  detail::tags::ToIsInt,
+                                  To_is_floating,
+                                  detail::tags::ToIsFloat,
+                                  detail::tags::NotArithmetic>::type;
+  return detail::safe_duration_cast_dispatch<To>(from, ec, FromTag{}, ToTag{});
 }
 
 #if SAFE_CHRONO_CONV_HAVE_EXCEPTIONS
 // throwing version
-template<typename To, typename From>
-To
-safe_duration_cast(From from)
+template<typename To, typename FromRep, typename FromPeriod>
+SDC_RELAXED_CONSTEXPR To
+safe_duration_cast(std::chrono::duration<FromRep, FromPeriod> from)
 {
   int ec = 0;
-  auto ret = safe_duration_cast<To, From>(from, ec);
+  auto ret = safe_duration_cast<To, FromRep, FromPeriod>(from, ec);
   if (ec) {
     throw std::runtime_error("failed conversion");
   }
