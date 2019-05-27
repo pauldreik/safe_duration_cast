@@ -1,12 +1,20 @@
-#include <iostream>
+/*
+ * By Paul Dreik 2019
+ *
+ * License:
+ * dual license, pick your choice. Either Boost license 1.0, or GPL(v2 or later,
+ * at your option).
+ */
 
 #include "chronoconv.hpp"
 
+#include <iostream>
 #include <cassert>
 #include <cstring>
 #include <limits>
 
-// fast rng
+// fast rng. see
+// https://lemire.me/blog/2019/03/19/the-fastest-conventional-random-number-generator-that-can-pass-big-crush/
 class Lehmer
 {
 public:
@@ -16,13 +24,14 @@ public:
     std::memcpy(&m_state, seed, std::min(Len, sizeof(m_state)));
   }
 
-  uint64_t get()
+  std::uint64_t get()
   {
     m_state *= 0xda942042e4dd58b5;
     return m_state >> 64;
   }
 
 private:
+  //assumes clang or gcc.
   __uint128_t m_state;
 };
 
