@@ -13,9 +13,9 @@
 #include <stdexcept>
 #include <type_traits>
 
-#include <detail/lossless_conversion.hpp>
-#include <detail/safe_float_conversion.hpp>
-#include <detail/stdutils.hpp>
+#include <safe_duration_cast/detail/lossless_conversion.hpp>
+#include <safe_duration_cast/detail/safe_float_conversion.hpp>
+#include <safe_duration_cast/detail/stdutils.hpp>
 
 
 

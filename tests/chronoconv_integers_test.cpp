@@ -8,7 +8,7 @@
 #include <catch.hpp>
 
 #include "testsupport.hpp"
-#include <chronoconv.hpp>
+#include <safe_duration_cast/chronoconv.hpp>
 #include <type_traits>
 
 template<typename To, typename From>

@@ -6,7 +6,7 @@
  * at your option).
  */
 
-#include "chronoconv.hpp"
+#include "safe_duration_cast/chronoconv.hpp"
 
 #include <algorithm>
 #include <cassert>

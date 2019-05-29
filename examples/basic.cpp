@@ -12,7 +12,7 @@
 #include <stdexcept>
 #include <type_traits>
 
-#include <chronoconv.hpp>
+#include <safe_duration_cast/chronoconv.hpp>
 
 template<typename To, typename From>
 void

@@ -10,7 +10,7 @@
 #include "testsupport.hpp"
 #include <climits>
 #include <cstdint>
-#include <detail/lossless_conversion.hpp>
+#include <safe_duration_cast/detail/lossless_conversion.hpp>
 #include <type_traits>
 
 // see

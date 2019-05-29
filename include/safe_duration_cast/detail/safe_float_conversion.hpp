@@ -12,7 +12,7 @@
 #include <limits>
 #include <type_traits>
 
-#include <detail/stdutils.hpp>
+#include <safe_duration_cast/detail/stdutils.hpp>
 
 namespace safe_duration_cast {
 

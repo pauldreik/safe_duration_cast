@@ -8,7 +8,7 @@
 #include <cassert>
 #include <cfloat>
 #include <chrono>
-#include <chronoconv.hpp>
+#include <safe_duration_cast/chronoconv.hpp>
 #include <climits>
 #include <iostream>
 #include <limits>

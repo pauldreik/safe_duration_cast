@@ -8,7 +8,7 @@
 #include <catch.hpp>
 
 #include <chrono>
-#include <chronoconv.hpp>
+#include <safe_duration_cast/chronoconv.hpp>
 
 TEST_CASE("what happens with bool")
 {

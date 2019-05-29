@@ -5,7 +5,7 @@
  * dual license, pick your choice. Either Boost license 1.0, or GPL(v2 or later,
  * at your option).
  */
-#include <chronoconv.hpp>
+#include <safe_duration_cast/chronoconv.hpp>
 #include <cstdint>
 #include <cstring>
 #include <stdexcept>

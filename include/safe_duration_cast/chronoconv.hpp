@@ -6,8 +6,8 @@
  * at your option).
  */
 
-#include <detail/chronoconv_detail.hpp>
-#include <detail/stdutils.hpp>
+#include <safe_duration_cast/detail/chronoconv_detail.hpp>
+#include <safe_duration_cast/detail/stdutils.hpp>
 
 // support compiling with exceptions disabled
 // this works in gcc>=5 and clang>=3.6 (have not tested visual studio)

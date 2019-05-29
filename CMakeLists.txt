@@ -11,11 +11,11 @@ cmake_minimum_required(VERSION 3.10)
 project(libchronoconv VERSION 0.0.0 LANGUAGES CXX)
 
 set(detail_header_files
-${CMAKE_CURRENT_SOURCE_DIR}/include/detail/chronoconv_detail.hpp
-${CMAKE_CURRENT_SOURCE_DIR}/include/detail/lossless_conversion.hpp
+${CMAKE_CURRENT_SOURCE_DIR}/include/safe_duration_cast/detail/chronoconv_detail.hpp
+${CMAKE_CURRENT_SOURCE_DIR}/include/safe_duration_cast/detail/lossless_conversion.hpp
 )
 set(header_files
-${CMAKE_CURRENT_SOURCE_DIR}/include/chronoconv.hpp
+${CMAKE_CURRENT_SOURCE_DIR}/include/safe_duration_cast/chronoconv.hpp
 )
 
 set(target_name chronoconv)
@@ -24,19 +24,19 @@ add_library(${target_name} INTERFACE)
 #target_compile_features(${target_name}     INTERFACE cxx_std_11)
 target_sources(${target_name}              INTERFACE ${detail_header_files} ${header_files})
 target_include_directories(${target_name}  INTERFACE include/)
-target_include_directories(${target_name}  SYSTEM INTERFACE include)
+target_include_directories(${target_name}  SYSTEM INTERFACE include/)
 target_compile_definitions(${target_name}  INTERFACE)
 
 #for installation
-install(FILES ${header_files}        DESTINATION include)
-install(FILES ${detail_header_files} DESTINATION include/detail)
+install(FILES ${header_files}        DESTINATION include/safe_duration_cast/)
+install(FILES ${detail_header_files} DESTINATION include/safe_duration_cast/detail)
 
 if (MSVC)
     # warning level 4 and all warnings as errors
     add_compile_options(/W4 /WX)
 else()
     # lots of warnings
-    add_compile_options(-Wall  -Wextra -pedantic -Wno-unused-parameter -Wno-unused-variable) #)
+    add_compile_options(-Wall  -Wextra -pedantic -Wno-unused-parameter -Wno-unused-variable)
 endif()
 
 
@@ -65,7 +65,6 @@ option(BUILD_EXAMPLES "enables building the examples" Off)
 if(BUILD_EXAMPLES)
    add_subdirectory(examples)
 endif()
-
 
 #fuzzing
 option(BUILD_FUZZERS "enables building the fuzzers" Off)

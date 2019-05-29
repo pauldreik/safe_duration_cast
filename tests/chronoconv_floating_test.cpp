@@ -9,7 +9,7 @@
 
 #include "testsupport.hpp"
 #include <chrono>
-#include <chronoconv.hpp>
+#include <safe_duration_cast/chronoconv.hpp>
 #include <type_traits>
 
 TEST_CASE("floating point sunshine upscale")
