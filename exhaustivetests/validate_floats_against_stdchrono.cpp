@@ -19,6 +19,7 @@
 #include <limits>
 #include <thread>
 #include <vector>
+#include <cfenv>
 
 using Count = std::int64_t;
 

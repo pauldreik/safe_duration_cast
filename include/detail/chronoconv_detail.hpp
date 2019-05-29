@@ -6,7 +6,6 @@
  * at your option).
  */
 #include <cassert>
-#include <cfenv>
 #include <chrono>
 #include <cmath>
 #include <iostream>
@@ -17,6 +16,19 @@
 #include <detail/lossless_conversion.hpp>
 #include <detail/safe_float_conversion.hpp>
 #include <detail/stdutils.hpp>
+
+
+
+#ifdef SDC_VERIFY_FLOATING_POINT_EXCEPTIONS
+#include <cassert>
+#include <cfenv>
+#define SDC_ASSERT_FLOATING_POINT_EXCEPTION \
+    assert(std::fetestexcept(FE_INVALID) == 0)
+#define SDC_RESET_FLOATING_POINT_EXCEPTION  std::feclearexcept(FE_ALL_EXCEPT)
+#else
+#define SDC_ASSERT_FLOATING_POINT_EXCEPTION do{}while(0)
+#define SDC_RESET_FLOATING_POINT_EXCEPTION do{}while(0)
+#endif
 
 namespace safe_duration_cast {
 
@@ -149,22 +161,22 @@ template<typename To, typename From>
 To
 convert_and_check_cfenv(From from)
 {
-  assert(std::fetestexcept(FE_INVALID) == 0);
   static_assert(std::is_floating_point<From>::value, "");
+
+  SDC_ASSERT_FLOATING_POINT_EXCEPTION;
   To count = from;
+#ifdef SDC_VERIFY_FLOATING_POINT_EXCEPTIONS
   if
     SDC_CONSTEXPR_IF(std::is_floating_point<To>::value)
     {
       // conversion float -> float
-      if (std::fetestexcept(FE_INVALID) != 0) {
-        std::cout << "From=" << from << '\n';
-      }
-      assert(std::fetestexcept(FE_INVALID) == 0);
+      SDC_ASSERT_FLOATING_POINT_EXCEPTION;
     }
   else {
     // conversion float->integer
-    assert(std::fetestexcept(FE_INVALID) == 0);
+    SDC_ASSERT_FLOATING_POINT_EXCEPTION;
   }
+  #endif
   return count;
 }
 
@@ -176,12 +188,12 @@ safe_duration_cast_dispatch(From from,
                             tags::ToIsFloat)
 {
   static_assert(is_floating_duration(From{}), "from must be floating point");
-  static_assert(is_floating_duration(To{}), "to must be floating point");
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  static_assert(is_floating_duration(To{}), "to must be floating point");  
+  SDC_ASSERT_FLOATING_POINT_EXCEPTION;
   if (std::isnan(from.count())) {
     // seems like the use of isnan raises an exception in itself!
-    std::feclearexcept(FE_ALL_EXCEPT);
-    assert(std::fetestexcept(FE_INVALID) == 0);
+    SDC_RESET_FLOATING_POINT_EXCEPTION;
+    SDC_ASSERT_FLOATING_POINT_EXCEPTION;
     // nan in, gives nan out. easy.
     return To{ std::numeric_limits<typename To::rep>::quiet_NaN() };
   }
@@ -193,7 +205,7 @@ safe_duration_cast_dispatch(From from,
     return To{ from.count() };
   }
 
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  SDC_ASSERT_FLOATING_POINT_EXCEPTION;
 
   ec = 0;
   // the basic idea is that we need to convert from count() in the from type
@@ -233,7 +245,7 @@ safe_duration_cast_dispatch(From from,
         return {};
       }
       count *= Factor::num;
-      assert(std::fetestexcept(FE_INVALID) == 0);
+      SDC_ASSERT_FLOATING_POINT_EXCEPTION;
     }
 
   // this can't go wrong, right? den>0 is checked earlier.
@@ -247,7 +259,7 @@ safe_duration_cast_dispatch(From from,
   if (ec) {
     return {};
   }
-  assert(std::fetestexcept(FE_INVALID) == 0);
+  SDC_ASSERT_FLOATING_POINT_EXCEPTION;
   return To{ tocount };
 }
 } // detail

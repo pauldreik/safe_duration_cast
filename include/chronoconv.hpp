@@ -16,6 +16,7 @@
 #include <stdexcept>
 #endif
 
+
 namespace safe_duration_cast {
 /**
  * A safe version of std::chrono_duration_cast, reporting an error instead
