@@ -28,26 +28,32 @@ fi
 export CXX
 export CXXFLAGS	
 
-#make a full sanitizers debug build with the default compiler, C++17
+#make a sanitizers debug build with the default compiler, C++17
 CXXFLAGS="-fsanitize=undefined,address -g -O0 -std=c++1z -Wall -Wextra"
 dobuild sanitizers_17 \
 -DBUILD_EXAMPLES=On \
+-DBUILD_FUZZERS=Off \
 -DBUILD_UNITTESTS=On \
 -DBUILD_EXHAUSTIVE_TESTS=On \
--DCMAKE_BUILD_TYPE=Debug 
+-DCMAKE_BUILD_TYPE=Debug \
+-DFUZZ_LINKMAIN=On
 
 #make sure the examples can be built with c++11
 CXXFLAGS="-g -O0 -std=c++11 -Wall -Wextra"
 dobuild normal_cpp11 \
 -DBUILD_EXAMPLES=On \
+-DBUILD_FUZZERS=Off \
 -DBUILD_UNITTESTS=Off \
--DCMAKE_BUILD_TYPE=Debug
+-DCMAKE_BUILD_TYPE=Debug \
+-DFUZZ_LINKMAIN=On
 
 #make a libfuzzer build with sanitizers
 CXX=clang++
 CXXFLAGS="-fsanitize=fuzzer-no-link,undefined,address -g -O0 -std=c++1z"
 dobuild libfuzzer_with_sanitizers \
+-DBUILD_EXAMPLES=Off \
 -DBUILD_FUZZERS=On \
+-DBUILD_UNITTESTS=Off \
 -DCMAKE_BUILD_TYPE=Debug \
 -DFUZZ_LINKMAIN=Off \
 -DFUZZ_LDFLAGS=-fsanitize=fuzzer
@@ -55,9 +61,14 @@ dobuild libfuzzer_with_sanitizers \
 #make a speed measurement build
 CXXFLAGS="-std=c++1z -Wall -Wextra"
 dobuild speedtest \
+-DBUILD_EXAMPLES=Off \
+-DBUILD_FUZZERS=Off \
+-DBUILD_UNITTESTS=Off \
 -DBUILD_SPEED_TESTS=On \
--DBUILD_EXHAUSTIVE_TESTS=On \
--DCMAKE_BUILD_TYPE=Release
+-DBUILD_EXHAUSTIVE_TESTS=Off \
+-DCMAKE_BUILD_TYPE=Release \
+-DFUZZ_LINKMAIN=On
 
 echo $me: all tests passed
+exit 0
 
